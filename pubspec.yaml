@@ -1,0 +1,67 @@
+name: aquagravity
+description: "AQUAGRAVITY - Stay Hydrated. Stay Grounded. A physics-based hydration tracking app."
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Icons
+  cupertino_icons: ^1.0.8
+  google_fonts: ^8.0.1
+  gap: ^3.0.1
+  glassmorphism: ^3.0.0
+  
+  # State Management
+  flutter_bloc: ^9.1.1
+  bloc: ^9.1.1
+  equatable: ^2.0.8
+  rxdart: ^0.28.0
+  
+  # Dependency Injection
+  get_it: ^9.2.0
+  injectable: ^2.7.1+4
+  
+  # Navigation
+  auto_route: ^11.1.0
+  
+  # Functional Programming & Error Handling
+  dartz: ^0.10.1
+  fpdart: ^1.2.0
+  
+  # Code Generation
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.10.0
+  
+  # Database
+  drift: ^2.22.0
+  drift_flutter: ^0.2.0
+  sqlite3_flutter_libs: ^0.5.24
+  path_provider: ^2.1.5
+  path: ^1.9.1
+  
+  # Utils
+  uuid: ^4.5.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # Linting
+  flutter_lints: ^6.0.0
+  
+  # Code Generation
+  build_runner: ^2.11.0
+  freezed: ^3.2.5
+  json_serializable: ^6.12.0
+  injectable_generator: ^2.12.0
+  auto_route_generator: ^10.4.0
+  drift_dev: ^2.22.0
+
+flutter:
+  uses-material-design: true
