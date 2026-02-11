@@ -470,7 +470,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       height: 200,
                       child: CircularProgressIndicator(
                         value: _progressAnimation.value,
-                        strokeWidth: 12,
+                        strokeWidth: 18,
                         backgroundColor: Colors.blue.shade50,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           isComplete
