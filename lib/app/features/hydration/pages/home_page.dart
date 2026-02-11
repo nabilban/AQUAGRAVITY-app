@@ -459,31 +459,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // Celebration glow effect at 100%
-                if (isComplete)
-                  AnimatedBuilder(
-                    animation: _celebrationAnimation,
-                    builder: (context, child) {
-                      final glowOpacity =
-                          0.3 + (_celebrationAnimation.value * 0.3);
-                      return Container(
-                        width: 220,
-                        height: 220,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(
-                                0xFF00BCD4,
-                              ).withOpacity(glowOpacity),
-                              blurRadius: 30,
-                              spreadRadius: 10,
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
+                // // Celebration glow effect at 100%
+                // if (isComplete)
+                //   AnimatedBuilder(
+                //     animation: _celebrationAnimation,
+                //     builder: (context, child) {
+                //       final glowOpacity =
+                //           0.3 + (_celebrationAnimation.value * 0.3);
+                //       return Container(
+                //         width: 220,
+                //         height: 220,
+                //         decoration: BoxDecoration(
+                //           shape: BoxShape.circle,
+                //           boxShadow: [
+                //             BoxShadow(
+                //               color: const Color(
+                //                 0xFF00BCD4,
+                //               ).withOpacity(glowOpacity),
+                //               blurRadius: 30,
+                //               spreadRadius: 10,
+                //             ),
+                //           ],
+                //         ),
+                //       );
+                //     },
+                //   ),
 
                 // Animated Circular Progress Indicator
                 AnimatedBuilder(
