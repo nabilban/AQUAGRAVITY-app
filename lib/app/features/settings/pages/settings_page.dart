@@ -1,7 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import '../../../ui/constants/app_dimens.dart';
+import '../cubit/theme_cubit.dart';
 
 /// Settings page for user preferences
 @RoutePage()
@@ -36,6 +38,18 @@ class SettingsPage extends StatelessWidget {
                         onTap: () {
                           // TODO: Implement daily goal settings
                         },
+                      ),
+                      const Divider(),
+                      ListTile(
+                        leading: const Icon(Icons.brightness_medium),
+                        title: const Text('Theme'),
+                        subtitle: Text(
+                          _getThemeText(
+                            context.watch<ThemeCubit>().state.themeMode,
+                          ),
+                        ),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => _showThemeDialog(context),
                       ),
                       const Divider(),
                       ListTile(
@@ -82,6 +96,43 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  String _getThemeText(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.system:
+        return 'System Default';
+      case ThemeMode.light:
+        return 'Light Mode';
+      case ThemeMode.dark:
+        return 'Dark Mode';
+    }
+  }
+
+  void _showThemeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SimpleDialog(
+          title: const Text('Select Theme'),
+          children: [
+            _buildThemeOption(context, ThemeMode.system, 'System Default'),
+            _buildThemeOption(context, ThemeMode.light, 'Light Mode'),
+            _buildThemeOption(context, ThemeMode.dark, 'Dark Mode'),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildThemeOption(BuildContext context, ThemeMode mode, String label) {
+    return SimpleDialogOption(
+      onPressed: () {
+        context.read<ThemeCubit>().updateTheme(mode);
+        Navigator.pop(context);
+      },
+      child: Text(label),
     );
   }
 }

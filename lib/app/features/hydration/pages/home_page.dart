@@ -7,6 +7,8 @@ import '../cubit/hydration_cubit.dart';
 import '../cubit/hydration_state.dart';
 import 'history_page.dart';
 import '../../settings/pages/settings_page_content.dart';
+import '../../settings/cubit/theme_cubit.dart';
+import '../../settings/cubit/theme_state.dart';
 
 /// Home page displaying hydration tracking with AQUAGRAVITY design
 @RoutePage()
@@ -276,7 +278,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(AppDimens.x4),
+          padding: const EdgeInsets.only(
+            left: AppDimens.x4,
+            right: AppDimens.x4,
+            top: AppDimens.x4,
+            bottom: 0,
+          ),
           child: Column(
             children: [
               // Logo and Title
@@ -291,6 +298,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
+                  ),
+                  const Spacer(),
+                  BlocBuilder<ThemeCubit, ThemeState>(
+                    builder: (context, state) {
+                      final isDark = state.themeMode == ThemeMode.dark;
+                      return IconButton(
+                        icon: Icon(
+                          isDark ? Icons.light_mode : Icons.dark_mode,
+                          color: Colors.white,
+                        ),
+                        onPressed: () {
+                          context.read<ThemeCubit>().updateTheme(
+                            isDark ? ThemeMode.light : ThemeMode.dark,
+                          );
+                        },
+                      );
+                    },
                   ),
                 ],
               ),

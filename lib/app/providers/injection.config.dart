@@ -11,6 +11,8 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:aquagravity/app/features/hydration/cubit/hydration_cubit.dart'
     as _i660;
+import 'package:aquagravity/app/features/settings/cubit/theme_cubit.dart'
+    as _i872;
 import 'package:aquagravity/app/providers/injection_modules.dart' as _i530;
 import 'package:aquagravity/core/data/database/app_database.dart' as _i1039;
 import 'package:aquagravity/core/data/database/daos/hydration_dao.dart'
@@ -33,6 +35,7 @@ extension GetItInjectableX on _i174.GetIt {
     final databaseModule = _$DatabaseModule();
     final repositoryModule = _$RepositoryModule();
     final cubitModule = _$CubitModule();
+    gh.factory<_i872.ThemeCubit>(() => _i872.ThemeCubit());
     gh.lazySingleton<_i1039.AppDatabase>(() => databaseModule.database);
     gh.lazySingleton<_i749.HydrationDao>(
       () => databaseModule.hydrationDao(gh<_i1039.AppDatabase>()),

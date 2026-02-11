@@ -4,6 +4,8 @@ import 'app/providers/injection.dart';
 import 'app/router/app_router.dart';
 import 'app/ui/theme/app_theme.dart';
 import 'app/features/hydration/cubit/hydration_cubit.dart';
+import 'app/features/settings/cubit/theme_cubit.dart';
+import 'app/features/settings/cubit/theme_state.dart';
 
 /// Bootstrap the application
 Future<void> bootstrap({required String environment}) async {
@@ -37,14 +39,21 @@ class _AquaGravityAppState extends State<AquaGravityApp> {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => getIt<HydrationCubit>())],
-      child: MaterialApp.router(
-        title: 'AQUAGRAVITY',
-        theme: AppTheme.lightTheme(),
-        darkTheme: AppTheme.darkTheme(),
-        themeMode: ThemeMode.system,
-        routerConfig: _appRouter.config(),
-        debugShowCheckedModeBanner: widget.environment != 'production',
+      providers: [
+        BlocProvider(create: (_) => getIt<HydrationCubit>()),
+        BlocProvider(create: (_) => getIt<ThemeCubit>()),
+      ],
+      child: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp.router(
+            title: 'AQUAGRAVITY',
+            theme: AppTheme.lightTheme(),
+            darkTheme: AppTheme.darkTheme(),
+            themeMode: state.themeMode,
+            routerConfig: _appRouter.config(),
+            debugShowCheckedModeBanner: widget.environment != 'production',
+          );
+        },
       ),
     );
   }
