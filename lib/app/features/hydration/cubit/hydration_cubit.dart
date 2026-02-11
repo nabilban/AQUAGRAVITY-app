@@ -71,6 +71,24 @@ class HydrationCubit extends Cubit<HydrationState> {
     );
   }
 
+  /// Update daily goal
+  Future<void> updateDailyGoal(double newGoal) async {
+    final result = await _settingsRepository.updateDailyGoal(newGoal);
+    result.fold(
+      (failure) => emit(HydrationState.error(message: failure.message)),
+      (_) {}, // Success - stream will update automatically
+    );
+  }
+
+  /// Clear all hydration logs
+  Future<void> clearAllLogs() async {
+    final result = await _hydrationRepository.clearAllLogs();
+    result.fold(
+      (failure) => emit(HydrationState.error(message: failure.message)),
+      (_) {}, // Success - stream will update automatically
+    );
+  }
+
   /// Refresh data
   void refresh() {
     _init();

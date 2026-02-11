@@ -49,6 +49,24 @@ class SettingsRepositoryImpl implements SettingsRepository {
   }
 
   @override
+  Future<Either<Failure, bool>> updateDailyGoal(double newGoal) async {
+    try {
+      // Ensure default settings exist
+      await _settingsDao.ensureDefaultSettings();
+
+      final entity = await _settingsDao.getSettings();
+      if (entity == null) {
+        return const Left(Failure.notFound(message: 'Settings not found'));
+      }
+      final updatedSettings = entity.toDomain().copyWith(dailyGoal: newGoal);
+      await _settingsDao.upsertSettings(updatedSettings.toCompanion());
+      return const Right(true);
+    } catch (e) {
+      return Left(Failure.database(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> resetSettings() async {
     try {
       final entity = await _settingsDao.getSettings();

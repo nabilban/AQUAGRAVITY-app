@@ -16,6 +16,9 @@ abstract class HydrationRepository {
   /// Delete a hydration log by ID
   Future<Either<Failure, bool>> deleteLog(String id);
 
+  /// Clear all hydration logs
+  Future<Either<Failure, bool>> clearAllLogs();
+
   /// Get today's total hydration amount
   Future<Either<Failure, double>> getTodayTotal();
 

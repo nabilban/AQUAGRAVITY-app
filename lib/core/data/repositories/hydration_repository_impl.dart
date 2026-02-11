@@ -48,6 +48,16 @@ class HydrationRepositoryImpl implements HydrationRepository {
   }
 
   @override
+  Future<Either<Failure, bool>> clearAllLogs() async {
+    try {
+      await _hydrationDao.deleteAllLogs();
+      return const Right(true);
+    } catch (e) {
+      return Left(Failure.database(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, double>> getTodayTotal() async {
     try {
       final total = await _hydrationDao.getTodayTotal();

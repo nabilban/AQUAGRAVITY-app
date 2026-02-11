@@ -13,6 +13,9 @@ abstract class SettingsRepository {
   /// Update user settings
   Future<Either<Failure, bool>> updateSettings(UserSettings settings);
 
+  /// Update daily goal
+  Future<Either<Failure, bool>> updateDailyGoal(double newGoal);
+
   /// Reset settings to default values
   Future<Either<Failure, bool>> resetSettings();
 }

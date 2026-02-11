@@ -10,7 +10,7 @@ Future<void> bootstrap({required String environment}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize dependency injection
-  configureDependencies();
+  await configureDependencies();
 
   runApp(AquaGravityApp(environment: environment));
 }

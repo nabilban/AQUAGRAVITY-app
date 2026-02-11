@@ -70,6 +70,12 @@ class HydrationDao extends DatabaseAccessor<AppDatabase>
     );
   }
 
+  /// Soft delete all hydration logs
+  Future<int> deleteAllLogs() {
+    return (update(hydrationLogs)..where((tbl) => tbl.deletedAt.isNull()))
+        .write(HydrationLogsCompanion(deletedAt: Value(DateTime.now())));
+  }
+
   /// Get today's total hydration amount
   Future<double> getTodayTotal() async {
     final logs = await watchTodayLogs().first;
