@@ -267,6 +267,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           colors: [
             Color(0xFF00BCD4), // Cyan
             Color(0xFF2196F3), // Blue
+            // Color(0xFF1976D2),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -389,7 +390,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           horizontal: AppDimens.x2,
         ),
         decoration: BoxDecoration(
-          color: Colors.transparent, // Transparent to show sliding indicator
+          color: Colors.white.withValues(
+            alpha: 0.25,
+          ), // Transparent to show sliding indicator
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -471,9 +474,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                         backgroundColor: Colors.blue.shade50,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           isComplete
-                              ? const Color(
-                                  0xFF1976D2,
-                                ) // Deep blue when complete
+                              ? const Color(0xFF2196F3)
                               : const Color(0xFF00BCD4),
                         ),
                       ),
@@ -529,7 +530,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   : const Color(0xFF00BCD4),
               fontWeight: FontWeight.bold,
             ),
-            child: Text('${todayTotal.toInt()} ml'),
+            child: Text(
+              '${todayTotal.toInt()} ml',
+              style: TextStyle(fontSize: 35),
+            ),
           ),
 
           const Gap(AppDimens.x1),
@@ -557,6 +561,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       colors: [
                         Color(0xFF1976D2).withOpacity(opacity),
                         Color(0xFF2196F3).withOpacity(opacity),
+                        Color(0xFF00BCD4).withOpacity(opacity),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
@@ -782,7 +787,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             Text(
               'Today\'s Log',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w800,
+                fontWeight: FontWeight.w900,
                 color: Colors.grey.shade800,
               ),
             ),

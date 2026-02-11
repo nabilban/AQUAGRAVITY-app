@@ -128,6 +128,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
@@ -247,6 +248,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
             color: Colors.grey.withOpacity(0.2),
