@@ -73,7 +73,14 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           initial: () => const Center(child: CircularProgressIndicator()),
           loading: () => const Center(child: CircularProgressIndicator()),
           loaded:
-              (logs, todayTotal, dailyGoal, reminderEnabled, reminderInterval) {
+              (
+                logs,
+                _,
+                todayTotal,
+                dailyGoal,
+                reminderEnabled,
+                reminderInterval,
+              ) {
                 _initializeFromState(
                   dailyGoal,
                   reminderEnabled,
@@ -85,11 +92,15 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error, size: 64, color: Colors.red),
+                Icon(
+                  Icons.error,
+                  size: 64,
+                  color: Theme.of(context).colorScheme.error,
+                ),
                 const Gap(AppDimens.x4),
                 Text(
                   'Error: $message',
-                  style: const TextStyle(color: Colors.red),
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
                 ),
                 const Gap(AppDimens.x4),
                 ElevatedButton(
@@ -159,12 +170,14 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00BCD4).withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.track_changes,
-                  color: Color(0xFF00BCD4),
+                  color: Theme.of(context).colorScheme.secondary,
                   size: 24,
                 ),
               ),
@@ -208,8 +221,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF00BCD4),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.secondary,
                         width: 2,
                       ),
                     ),
@@ -278,12 +291,14 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withValues(alpha: 0.1),
+                  color: Theme.of(
+                    context,
+                  ).colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.notifications_outlined,
-                  color: Color(0xFF2196F3),
+                  color: Theme.of(context).colorScheme.primary,
                   size: 24,
                 ),
               ),
@@ -310,10 +325,10 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     onChanged: (value) {
                       _remindersEnabledNotifier.value = value;
                     },
-                    activeTrackColor: const Color(
-                      0xFF00BCD4,
-                    ).withValues(alpha: 0.5),
-                    activeThumbColor: const Color(0xFF00BCD4),
+                    activeTrackColor: Theme.of(
+                      context,
+                    ).colorScheme.secondary.withValues(alpha: 0.5),
+                    activeThumbColor: Theme.of(context).colorScheme.secondary,
                   );
                 },
               ),
@@ -366,8 +381,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF00BCD4),
+                          borderSide: BorderSide(
+                            color: Theme.of(context).colorScheme.secondary,
                             width: 2,
                           ),
                         ),
@@ -393,8 +408,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               label: const Text('Test Immediate Notification'),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 12),
-                side: const BorderSide(color: Color(0xFF2196F3)),
-                foregroundColor: const Color(0xFF2196F3),
+                side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                foregroundColor: Theme.of(context).colorScheme.primary,
               ),
             ),
           ),
@@ -448,14 +463,22 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: hasChanges
-                    ? [const Color(0xFF00BCD4), const Color(0xFF2196F3)]
-                    : [Colors.grey.shade400, Colors.grey.shade500],
+                    ? [
+                        Theme.of(context).colorScheme.secondary,
+                        Theme.of(context).colorScheme.primary,
+                      ]
+                    : [
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                        Theme.of(context).colorScheme.outline,
+                      ],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: hasChanges
                   ? [
                       BoxShadow(
-                        color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.secondary.withValues(alpha: 0.3),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -502,19 +525,24 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Colors.red.shade50,
+        color: Theme.of(
+          context,
+        ).colorScheme.errorContainer.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.red.shade200),
+        border: Border.all(
+          width: 2,
+          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Danger Zone',
+            'Danger Zone !',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.red.shade900,
+              color: Theme.of(context).colorScheme.error,
             ),
           ),
           const Gap(AppDimens.x4),
@@ -525,21 +553,24 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 _showClearDataDialog(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
+                backgroundColor: Theme.of(context).colorScheme.errorContainer,
                 padding: const EdgeInsets.symmetric(vertical: AppDimens.x4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.delete_forever, color: Colors.white),
+                  Icon(
+                    Icons.delete_forever,
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
                   Gap(AppDimens.x2),
                   Text(
                     'Clear All Data',
                     style: TextStyle(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onError,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -588,7 +619,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Text('Settings saved successfully!'),
             ],
           ),
-          backgroundColor: const Color(0xFF1976D2),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -605,7 +636,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Text('Please enter a valid daily goal'),
             ],
           ),
-          backgroundColor: Colors.red,
+          backgroundColor: Theme.of(context).colorScheme.error,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
@@ -647,7 +678,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       Text('All data cleared'),
                     ],
                   ),
-                  backgroundColor: Colors.red,
+                  backgroundColor: Theme.of(context).colorScheme.error,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -655,7 +686,9 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 ),
               );
             },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
             child: const Text(
               'Clear Data',
               style: TextStyle(color: Colors.white),

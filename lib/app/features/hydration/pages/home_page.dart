@@ -124,7 +124,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           return state.when(
             initial: () => const Center(child: Text('Initializing...')),
             loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (logs, todayTotal, dailyGoal, p3, p4) =>
+            loaded: (logs, _, todayTotal, dailyGoal, p4, p5) =>
                 _buildLoadedView(context, logs, todayTotal, dailyGoal),
             error: (message) => Center(
               child: Column(
@@ -175,6 +175,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 300),
             switchInCurve: Curves.easeOut,
             switchOutCurve: Curves.easeIn,
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                alignment: Alignment.topCenter,
+                children: <Widget>[...previousChildren, ?currentChild],
+              );
+            },
             child: _selectedTab == 0
                 ? KeyedSubtree(
                     key: const ValueKey(0),
@@ -256,12 +262,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Widget _buildHeader(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            Color(0xFF00BCD4), // Cyan
-            Color(0xFF2196F3), // Blue
-            // Color(0xFF1976D2),
+            Theme.of(context).colorScheme.secondary,
+            Theme.of(context).colorScheme.primary,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -281,12 +286,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               // Logo and Title
               Row(
                 children: [
-                  const Icon(Icons.water_drop, color: Colors.white, size: 32),
+                  Icon(
+                    Icons.water_drop,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                    size: 32,
+                  ),
                   const Gap(AppDimens.x2),
                   Text(
                     'AQUAGRAVITY',
                     style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -298,7 +307,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       return IconButton(
                         icon: Icon(
                           isDark ? Icons.light_mode : Icons.dark_mode,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                         ),
                         onPressed: () {
                           context.read<ThemeCubit>().updateTheme(
@@ -416,14 +425,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           children: [
             Icon(
               icon,
-              color: isSelected ? const Color(0xFF00BCD4) : Colors.white,
+              color: isSelected
+                  ? Theme.of(context).colorScheme.secondary
+                  : Theme.of(context).colorScheme.onPrimary,
               size: 24,
             ),
             const Gap(4),
             Text(
               label,
               style: TextStyle(
-                color: isSelected ? const Color(0xFF00BCD4) : Colors.white,
+                color: isSelected
+                    ? Theme.of(context).colorScheme.secondary
+                    : Theme.of(context).colorScheme.onPrimary,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -461,11 +474,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: CircularProgressIndicator(
                         value: _progressAnimation.value,
                         strokeWidth: 18,
-                        backgroundColor: Colors.blue.shade50,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).colorScheme.surfaceContainerHighest,
                         valueColor: AlwaysStoppedAnimation<Color>(
                           isComplete
-                              ? const Color(0xFF2196F3)
-                              : const Color(0xFF00BCD4),
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                     );
@@ -497,10 +512,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           Icons.water_drop,
                           size: 64,
                           color: isComplete
-                              ? const Color(
-                                  0xFF1976D2,
-                                ) // Deep blue when complete
-                              : const Color(0xFF2196F3),
+                              ? Theme.of(context)
+                                    .colorScheme
+                                    .primary // Deep blue when complete
+                              : Theme.of(context).colorScheme.secondary,
                         ),
                       ),
                     );
@@ -516,8 +531,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             duration: const Duration(milliseconds: 300),
             style: Theme.of(context).textTheme.headlineLarge!.copyWith(
               color: isComplete
-                  ? const Color(0xFF1976D2)
-                  : const Color(0xFF00BCD4),
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.secondary,
               fontWeight: FontWeight.bold,
             ),
             child: Text(
@@ -549,15 +564,23 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFF1976D2).withValues(alpha: opacity),
-                        Color(0xFF2196F3).withValues(alpha: opacity),
-                        Color(0xFF00BCD4).withValues(alpha: opacity),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: opacity),
+                        Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: opacity),
+                        Theme.of(
+                          context,
+                        ).colorScheme.secondary.withValues(alpha: opacity),
                       ],
                     ),
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF1976D2).withValues(alpha: 0.3),
+                        color: Theme.of(
+                          context,
+                        ).colorScheme.primary.withValues(alpha: 0.3),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -592,13 +615,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 vertical: AppDimens.x2,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF00BCD4).withValues(alpha: 0.1),
+                color: Theme.of(
+                  context,
+                ).colorScheme.secondary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
                 '${(progress * 100).toInt()}% complete',
-                style: const TextStyle(
-                  color: Color(0xFF00BCD4),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.secondary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -628,7 +653,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 icon: Icons.local_bar,
                 label: 'Glass',
                 amount: '250ml',
-                color: const Color(0xFF00BCD4),
+                color: Theme.of(context).colorScheme.secondary,
                 onTap: () => _addWater(250),
               ),
             ),
@@ -639,7 +664,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 icon: Icons.water_drop,
                 label: 'Bottle',
                 amount: '500ml',
-                color: const Color(0xFF2196F3),
+                color: Theme.of(context).colorScheme.primary,
                 onTap: () => _addWater(500),
               ),
             ),
@@ -650,7 +675,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 icon: Icons.coffee,
                 label: 'Large',
                 amount: '750ml',
-                color: const Color(0xFF7C4DFF),
+                color: Theme.of(context).colorScheme.tertiary,
                 onTap: () => _addWater(750),
               ),
             ),
@@ -743,8 +768,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             ElevatedButton(
               onPressed: _addCustomAmount,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00BCD4),
-                foregroundColor: Colors.white,
+                backgroundColor: Theme.of(context).colorScheme.secondary,
+                foregroundColor: Theme.of(context).colorScheme.onSecondary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: AppDimens.x6,
                   vertical: AppDimens.x4,
@@ -842,7 +867,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     children: [
                       Icon(
                         Icons.water_drop,
-                        color: const Color(0xFF00BCD4),
+                        color: Theme.of(context).colorScheme.secondary,
                         size: 20,
                       ),
                       const Gap(AppDimens.x3),

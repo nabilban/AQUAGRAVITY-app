@@ -6,17 +6,21 @@ class AppTheme {
   AppTheme._(); // Private constructor to prevent instantiation
 
   // Blue-teal color palette for water theming
-  static const Color _primaryLight = Color(0xFF0288D1); // Light Blue 700
-  static const Color _secondaryLight = Color(0xFF00BCD4); // Cyan 500
-  static const Color _tertiaryLight = Color(0xFF26C6DA); // Cyan 400
+  static const Color _primaryLight = Color(0xFF2196F3); // Blue 500 (Bottle)
+  static const Color _secondaryLight = Color(0xFF00BCD4); // Cyan 500 (Glass)
+  static const Color _tertiaryLight = Color(
+    0xFF7C4DFF,
+  ); // Deep Purple A200 (Large)
   static const Color _surfaceLight = Color(0xFFF5F5F5);
   static const Color _backgroundLight = Color(0xFFFFFFFF);
+  static const Color _errorLight = Color(0xFFD32F2F); // Red 700
 
-  static const Color _primaryDark = Color(0xFF4FC3F7); // Light Blue 300
-  static const Color _secondaryDark = Color(0xFF26C6DA); // Cyan 400
-  static const Color _tertiaryDark = Color(0xFF00BCD4); // Cyan 500
+  static const Color _primaryDark = Color(0xFF64B5F6); // Blue 300
+  static const Color _secondaryDark = Color(0xFF4DD0E1); // Cyan 300
+  static const Color _tertiaryDark = Color(0xFFB388FF); // Deep Purple 200
   static const Color _surfaceDark = Color(0xFF1E1E1E);
   static const Color _backgroundDark = Color(0xFF121212);
+  static const Color _errorDark = Color(0xFFEF5350); // Red 400
 
   /// Light theme configuration
   static ThemeData lightTheme() {
@@ -26,6 +30,7 @@ class AppTheme {
       tertiary: _tertiaryLight,
       surface: _surfaceLight,
       surfaceContainerLow: _backgroundLight,
+      error: _errorLight,
     );
 
     return _buildTheme(colorScheme);
@@ -39,6 +44,7 @@ class AppTheme {
       tertiary: _tertiaryDark,
       surface: _surfaceDark,
       surfaceContainerLow: _backgroundDark,
+      error: _errorDark,
     );
 
     return _buildTheme(colorScheme);

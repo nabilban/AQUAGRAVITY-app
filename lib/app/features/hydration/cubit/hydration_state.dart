@@ -12,6 +12,7 @@ sealed class HydrationState with _$HydrationState {
 
   const factory HydrationState.loaded({
     required List<HydrationLog> logs,
+    required List<HydrationLog> allLogs,
     required double todayTotal,
     required double dailyGoal,
     required bool reminderEnabled,

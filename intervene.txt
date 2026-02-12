@@ -1,4 +1,7 @@
-3 x counts
-1 . adding alarm permision for local notification
-2 .  fixing the ui for more liking (color and animation);
-3 .  deleteing unused pages
+4 x counts of intervention
+
+1 .  adding alarm permision in manifest for local notification 
+2 .  fixing the ui to more liking (color and animation);
+3 .  deleteing unused pages (settings_page.dart)
+4 .  fixing null error in history page (when there is no data)
+

@@ -29,19 +29,33 @@ class HydrationCubit extends Cubit<HydrationState> {
 
     // Combine streams of logs and settings
     Rx.combineLatest2(
-      _hydrationRepository.watchTodayLogs(),
+      _hydrationRepository.watchLogs(),
       _settingsRepository.watchSettings(),
       (logs, settings) => (logs: logs, settings: settings),
     ).listen(
       (data) {
-        final total = data.logs.fold(0.0, (sum, log) => sum + log.amount);
+        final now = DateTime.now();
+        final startOfDay = DateTime(now.year, now.month, now.day);
+        final endOfDay = startOfDay.add(const Duration(days: 1));
+
+        final todayLogs = data.logs
+            .where(
+              (log) =>
+                  log.timestamp.isAfter(startOfDay) &&
+                      log.timestamp.isBefore(endOfDay) ||
+                  log.timestamp.isAtSameMomentAs(startOfDay),
+            )
+            .toList();
+
+        final total = todayLogs.fold(0.0, (sum, log) => sum + log.amount);
 
         // Handle notifications
-        _manageNotifications(data.logs, data.settings, total);
+        _manageNotifications(todayLogs, data.settings, total);
 
         emit(
           HydrationState.loaded(
-            logs: data.logs,
+            logs: todayLogs,
+            allLogs: data.logs,
             todayTotal: total,
             dailyGoal: data.settings.dailyGoal,
             reminderEnabled: data.settings.reminderEnabled,

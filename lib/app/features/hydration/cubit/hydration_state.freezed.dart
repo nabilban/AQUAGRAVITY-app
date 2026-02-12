@@ -125,12 +125,12 @@ return error(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<HydrationLog> logs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  initial,TResult Function()?  loading,TResult Function( List<HydrationLog> logs,  List<HydrationLog> allLogs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  loaded,TResult Function( String message)?  error,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Loaded() when loaded != null:
-return loaded(_that.logs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error() when error != null:
+return loaded(_that.logs,_that.allLogs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error() when error != null:
 return error(_that.message);case _:
   return orElse();
 
@@ -149,12 +149,12 @@ return error(_that.message);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<HydrationLog> logs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)  loaded,required TResult Function( String message)  error,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  initial,required TResult Function()  loading,required TResult Function( List<HydrationLog> logs,  List<HydrationLog> allLogs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)  loaded,required TResult Function( String message)  error,}) {final _that = this;
 switch (_that) {
 case _Initial():
 return initial();case _Loading():
 return loading();case _Loaded():
-return loaded(_that.logs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error():
+return loaded(_that.logs,_that.allLogs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error():
 return error(_that.message);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -169,12 +169,12 @@ return error(_that.message);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<HydrationLog> logs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  initial,TResult? Function()?  loading,TResult? Function( List<HydrationLog> logs,  List<HydrationLog> allLogs,  double todayTotal,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  loaded,TResult? Function( String message)?  error,}) {final _that = this;
 switch (_that) {
 case _Initial() when initial != null:
 return initial();case _Loading() when loading != null:
 return loading();case _Loaded() when loaded != null:
-return loaded(_that.logs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error() when error != null:
+return loaded(_that.logs,_that.allLogs,_that.todayTotal,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _Error() when error != null:
 return error(_that.message);case _:
   return null;
 
@@ -251,7 +251,7 @@ String toString() {
 
 
 class _Loaded implements HydrationState {
-  const _Loaded({required final  List<HydrationLog> logs, required this.todayTotal, required this.dailyGoal, required this.reminderEnabled, required this.reminderInterval}): _logs = logs;
+  const _Loaded({required final  List<HydrationLog> logs, required final  List<HydrationLog> allLogs, required this.todayTotal, required this.dailyGoal, required this.reminderEnabled, required this.reminderInterval}): _logs = logs,_allLogs = allLogs;
   
 
  final  List<HydrationLog> _logs;
@@ -259,6 +259,13 @@ class _Loaded implements HydrationState {
   if (_logs is EqualUnmodifiableListView) return _logs;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_logs);
+}
+
+ final  List<HydrationLog> _allLogs;
+ List<HydrationLog> get allLogs {
+  if (_allLogs is EqualUnmodifiableListView) return _allLogs;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_allLogs);
 }
 
  final  double todayTotal;
@@ -276,16 +283,16 @@ _$LoadedCopyWith<_Loaded> get copyWith => __$LoadedCopyWithImpl<_Loaded>(this, _
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaded&&const DeepCollectionEquality().equals(other._logs, _logs)&&(identical(other.todayTotal, todayTotal) || other.todayTotal == todayTotal)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Loaded&&const DeepCollectionEquality().equals(other._logs, _logs)&&const DeepCollectionEquality().equals(other._allLogs, _allLogs)&&(identical(other.todayTotal, todayTotal) || other.todayTotal == todayTotal)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_logs),todayTotal,dailyGoal,reminderEnabled,reminderInterval);
+int get hashCode => Object.hash(runtimeType,const DeepCollectionEquality().hash(_logs),const DeepCollectionEquality().hash(_allLogs),todayTotal,dailyGoal,reminderEnabled,reminderInterval);
 
 @override
 String toString() {
-  return 'HydrationState.loaded(logs: $logs, todayTotal: $todayTotal, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval)';
+  return 'HydrationState.loaded(logs: $logs, allLogs: $allLogs, todayTotal: $todayTotal, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval)';
 }
 
 
@@ -296,7 +303,7 @@ abstract mixin class _$LoadedCopyWith<$Res> implements $HydrationStateCopyWith<$
   factory _$LoadedCopyWith(_Loaded value, $Res Function(_Loaded) _then) = __$LoadedCopyWithImpl;
 @useResult
 $Res call({
- List<HydrationLog> logs, double todayTotal, double dailyGoal, bool reminderEnabled, int reminderInterval
+ List<HydrationLog> logs, List<HydrationLog> allLogs, double todayTotal, double dailyGoal, bool reminderEnabled, int reminderInterval
 });
 
 
@@ -313,9 +320,10 @@ class __$LoadedCopyWithImpl<$Res>
 
 /// Create a copy of HydrationState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') $Res call({Object? logs = null,Object? todayTotal = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,}) {
+@pragma('vm:prefer-inline') $Res call({Object? logs = null,Object? allLogs = null,Object? todayTotal = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,}) {
   return _then(_Loaded(
 logs: null == logs ? _self._logs : logs // ignore: cast_nullable_to_non_nullable
+as List<HydrationLog>,allLogs: null == allLogs ? _self._allLogs : allLogs // ignore: cast_nullable_to_non_nullable
 as List<HydrationLog>,todayTotal: null == todayTotal ? _self.todayTotal : todayTotal // ignore: cast_nullable_to_non_nullable
 as double,dailyGoal: null == dailyGoal ? _self.dailyGoal : dailyGoal // ignore: cast_nullable_to_non_nullable
 as double,reminderEnabled: null == reminderEnabled ? _self.reminderEnabled : reminderEnabled // ignore: cast_nullable_to_non_nullable
