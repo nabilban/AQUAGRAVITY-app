@@ -1,0 +1,4 @@
+3 x counts
+1 . adding alarm permision for local notification
+2 .  fixing the ui for more liking (color and animation);
+3 .  deleteing unused pages

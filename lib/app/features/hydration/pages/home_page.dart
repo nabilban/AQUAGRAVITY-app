@@ -30,8 +30,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _celebrationAnimationController;
   late Animation<double> _celebrationAnimation;
   bool _hasReached100 = false;
-  late AnimationController _fadeAnimationController;
-  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -74,22 +72,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         curve: Curves.easeInOut,
       ),
     );
-
-    // Fade animation controller (for tab transitions)
-    _fadeAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _fadeAnimationController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    // Start with fade in
-    _fadeAnimationController.forward();
   }
 
   @override
@@ -97,7 +79,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _progressAnimationController.dispose();
     _floatingAnimationController.dispose();
     _celebrationAnimationController.dispose();
-    _fadeAnimationController.dispose();
+
     _customAmountController.dispose();
     super.dispose();
   }
@@ -128,14 +110,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   void _switchTab(int newTab) {
     if (_selectedTab != newTab) {
-      // Fade out
-      _fadeAnimationController.reverse().then((_) {
-        // Change tab
-        setState(() {
-          _selectedTab = newTab;
-        });
-        // Fade in
-        _fadeAnimationController.forward();
+      setState(() {
+        _selectedTab = newTab;
       });
     }
   }
@@ -195,19 +171,35 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
         // Content based on selected tab with fade animation
         Expanded(
-          child: FadeTransition(
-            opacity: _fadeAnimation,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            switchInCurve: Curves.easeOut,
+            switchOutCurve: Curves.easeIn,
             child: _selectedTab == 0
-                ? _buildTrackerContent(
-                    context,
-                    logs,
-                    todayTotal,
-                    dailyGoal,
-                    progress,
+                ? KeyedSubtree(
+                    key: const ValueKey(0),
+                    child: _buildTrackerContent(
+                      context,
+                      logs,
+                      todayTotal,
+                      dailyGoal,
+                      progress,
+                    ),
                   )
                 : _selectedTab == 1
-                ? _buildHistoryContent(context, logs, todayTotal, dailyGoal)
-                : _buildSettingsContent(context),
+                ? KeyedSubtree(
+                    key: const ValueKey(1),
+                    child: _buildHistoryContent(
+                      context,
+                      logs,
+                      todayTotal,
+                      dailyGoal,
+                    ),
+                  )
+                : KeyedSubtree(
+                    key: const ValueKey(2),
+                    child: _buildSettingsContent(context),
+                  ),
           ),
         ),
       ],
@@ -459,32 +451,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                // // Celebration glow effect at 100%
-                // if (isComplete)
-                //   AnimatedBuilder(
-                //     animation: _celebrationAnimation,
-                //     builder: (context, child) {
-                //       final glowOpacity =
-                //           0.3 + (_celebrationAnimation.value * 0.3);
-                //       return Container(
-                //         width: 220,
-                //         height: 220,
-                //         decoration: BoxDecoration(
-                //           shape: BoxShape.circle,
-                //           boxShadow: [
-                //             BoxShadow(
-                //               color: const Color(
-                //                 0xFF00BCD4,
-                //               ).withOpacity(glowOpacity),
-                //               blurRadius: 30,
-                //               spreadRadius: 10,
-                //             ),
-                //           ],
-                //         ),
-                //       );
-                //     },
-                //   ),
-
                 // Animated Circular Progress Indicator
                 AnimatedBuilder(
                   animation: _progressAnimation,

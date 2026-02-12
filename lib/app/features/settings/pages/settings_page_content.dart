@@ -16,7 +16,9 @@ class SettingsPageContent extends StatefulWidget {
 class _SettingsPageContentState extends State<SettingsPageContent> {
   final TextEditingController _dailyGoalController = TextEditingController();
   final TextEditingController _intervalController = TextEditingController();
-  bool _remindersEnabled = false;
+  late final ValueNotifier<bool> _remindersEnabledNotifier = ValueNotifier(
+    false,
+  );
 
   // Track original values to detect changes
   double? _originalDailyGoal;
@@ -29,6 +31,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
   void dispose() {
     _dailyGoalController.dispose();
     _intervalController.dispose();
+    _remindersEnabledNotifier.dispose();
     super.dispose();
   }
 
@@ -42,7 +45,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
       _dailyGoalController.text = dailyGoal.toInt().toString();
       _originalRemindersEnabled = reminderEnabled;
       _originalInterval = reminderInterval;
-      _remindersEnabled = reminderEnabled;
+      _remindersEnabledNotifier.value = reminderEnabled;
       _intervalController.text = reminderInterval.toString();
       _isInitialized = true;
     }
@@ -58,7 +61,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         int.tryParse(_intervalController.text) ?? _originalInterval;
 
     return currentGoal != _originalDailyGoal ||
-        _remindersEnabled != _originalRemindersEnabled ||
+        _remindersEnabledNotifier.value != _originalRemindersEnabled ||
         currentInterval != _originalInterval;
   }
 
@@ -69,10 +72,15 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         return state.when(
           initial: () => const Center(child: CircularProgressIndicator()),
           loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (logs, todayTotal, dailyGoal, reminderEnabled, reminderInterval) {
-            _initializeFromState(dailyGoal, reminderEnabled, reminderInterval);
-            return _buildContent(context, dailyGoal);
-          },
+          loaded:
+              (logs, todayTotal, dailyGoal, reminderEnabled, reminderInterval) {
+                _initializeFromState(
+                  dailyGoal,
+                  reminderEnabled,
+                  reminderInterval,
+                );
+                return _buildContent(context, dailyGoal);
+              },
           error: (message) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -182,8 +190,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   controller: _dailyGoalController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
-                  onChanged: (_) =>
-                      setState(() {}), // Trigger rebuild to update button state
+                  onChanged: (_) {}, // Let ListenableBuilder update save button
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -295,77 +302,90 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 'Enable reminders',
                 style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
               ),
-              Switch(
-                value: _remindersEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    _remindersEnabled = value;
-                  });
+              ValueListenableBuilder<bool>(
+                valueListenable: _remindersEnabledNotifier,
+                builder: (context, remindersEnabled, _) {
+                  return Switch(
+                    value: remindersEnabled,
+                    onChanged: (value) {
+                      _remindersEnabledNotifier.value = value;
+                    },
+                    activeTrackColor: const Color(
+                      0xFF00BCD4,
+                    ).withValues(alpha: 0.5),
+                    activeThumbColor: const Color(0xFF00BCD4),
+                  );
                 },
-                activeTrackColor: const Color(0xFF00BCD4).withValues(alpha: 0.5),
-                activeThumbColor: const Color(0xFF00BCD4),
               ),
             ],
           ),
           const Gap(AppDimens.x4),
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  'Interval (minutes)',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
-                ),
-              ),
-              SizedBox(
-                width: 120,
-                child: TextField(
-                  controller: _intervalController,
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  enabled: _remindersEnabled,
-                  onChanged: (_) =>
-                      setState(() {}), // Trigger rebuild to update button state
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: _remindersEnabled
-                        ? Colors.grey.shade50
-                        : Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
-                    ),
-                    disabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Color(0xFF00BCD4),
-                        width: 2,
+          ValueListenableBuilder<bool>(
+            valueListenable: _remindersEnabledNotifier,
+            builder: (context, remindersEnabled, _) {
+              return Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      'Interval (minutes)',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey.shade700,
                       ),
                     ),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppDimens.x4,
-                      vertical: AppDimens.x3,
+                  ),
+                  SizedBox(
+                    width: 120,
+                    child: TextField(
+                      controller: _intervalController,
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      enabled: remindersEnabled,
+                      onChanged:
+                          (_) {}, // Let ListenableBuilder update save button
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      decoration: InputDecoration(
+                        filled: true,
+                        fillColor: remindersEnabled
+                            ? Colors.grey.shade50
+                            : Colors.grey.shade100,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(
+                            color: Color(0xFF00BCD4),
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: AppDimens.x4,
+                          vertical: AppDimens.x3,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-            ],
+                ],
+              );
+            },
           ),
           const Gap(AppDimens.x4),
           SizedBox(
             width: double.infinity,
-             child: OutlinedButton.icon(
+            child: OutlinedButton.icon(
               onPressed: () {
                 context.read<HydrationCubit>().testNotification();
               },
@@ -412,59 +432,69 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
   }
 
   Widget _buildSaveButton(BuildContext context) {
-    final hasChanges = _hasChanges();
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        _dailyGoalController,
+        _remindersEnabledNotifier,
+        _intervalController,
+      ]),
+      builder: (context, _) {
+        final hasChanges = _hasChanges();
 
-    return Opacity(
-      opacity: hasChanges ? 1.0 : 0.5,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: hasChanges
-                ? [const Color(0xFF00BCD4), const Color(0xFF2196F3)]
-                : [Colors.grey.shade400, Colors.grey.shade500],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: hasChanges
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
-                  ),
-                ]
-              : [],
-        ),
-        child: ElevatedButton(
-          onPressed: hasChanges ? () => _saveSettings(context) : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.transparent,
-            shadowColor: Colors.transparent,
-            disabledBackgroundColor: Colors.transparent,
-            padding: const EdgeInsets.symmetric(vertical: AppDimens.x4),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.save,
-                color: hasChanges ? Colors.white : Colors.white70,
+        return AnimatedOpacity(
+          opacity: hasChanges ? 1.0 : 0.5,
+          duration: const Duration(milliseconds: 300),
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: hasChanges
+                    ? [const Color(0xFF00BCD4), const Color(0xFF2196F3)]
+                    : [Colors.grey.shade400, Colors.grey.shade500],
               ),
-              const Gap(AppDimens.x2),
-              Text(
-                'Save Settings',
-                style: TextStyle(
-                  color: hasChanges ? Colors.white : Colors.white70,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: hasChanges
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : [],
+            ),
+            child: ElevatedButton(
+              onPressed: hasChanges ? () => _saveSettings(context) : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                disabledBackgroundColor: Colors.transparent,
+                padding: const EdgeInsets.symmetric(vertical: AppDimens.x4),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
                 ),
               ),
-            ],
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.save,
+                    color: hasChanges ? Colors.white : Colors.white70,
+                  ),
+                  const Gap(AppDimens.x2),
+                  Text(
+                    'Save Settings',
+                    style: TextStyle(
+                      color: hasChanges ? Colors.white : Colors.white70,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -528,15 +558,15 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
     if (dailyGoal != null && dailyGoal > 0) {
       final cubit = context.read<HydrationCubit>();
-      
+
       if (dailyGoal != _originalDailyGoal) {
         cubit.updateDailyGoal(dailyGoal);
       }
-      
-      if (_remindersEnabled != _originalRemindersEnabled) {
-        cubit.toggleReminders(_remindersEnabled);
+
+      if (_remindersEnabledNotifier.value != _originalRemindersEnabled) {
+        cubit.toggleReminders(_remindersEnabledNotifier.value);
       }
-      
+
       final interval = int.tryParse(_intervalController.text);
       if (interval != null && interval != _originalInterval) {
         cubit.updateReminderInterval(interval);
@@ -545,7 +575,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
       // Update original values after successful save
       setState(() {
         _originalDailyGoal = dailyGoal;
-        _originalRemindersEnabled = _remindersEnabled;
+        _originalRemindersEnabled = _remindersEnabledNotifier.value;
         _originalInterval = int.tryParse(_intervalController.text) ?? 60;
       });
 

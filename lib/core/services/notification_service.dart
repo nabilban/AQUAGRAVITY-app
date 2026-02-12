@@ -82,29 +82,75 @@ class NotificationService {
     return false;
   }
 
-  /// Schedules a notification to appear [minutes] from now
-  Future<void> scheduleReminder(int minutes) async {
-    await cancelAllNotifications(); // Cancel previous schedules to avoid clutter
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-          'hydration_reminders',
-          'Hydration Reminders',
-          channelDescription: 'Reminders to drink water',
-          importance: Importance.high,
-          priority: Priority.high,
-          ticker: 'ticker',
+  /// Schedules smart reminders avoiding 10 PM - 7 AM
+  Future<void> scheduleReminder(int intervalMinutes) async {
+    await cancelAllNotifications();
+
+    // Safety check
+    if (intervalMinutes <= 0) return;
+
+    final tz.TZDateTime now = tz.TZDateTime.now(tz.local);
+    tz.TZDateTime scheduledDate = now;
+
+    int scheduledCount = 0;
+    const int maxNotifications = 40; // Stay well under limit (iOS 64)
+
+    while (scheduledCount < maxNotifications) {
+      // Advance by interval
+      scheduledDate = scheduledDate.add(Duration(minutes: intervalMinutes));
+
+      // Check quiet hours (10 PM - 7 AM)
+      // If after 10 PM (22:00), jump to next day 7 AM
+      if (scheduledDate.hour >= 22) {
+        scheduledDate = tz.TZDateTime(
+          tz.local,
+          scheduledDate.year,
+          scheduledDate.month,
+          scheduledDate.day,
+          7, // 7:00 AM
+          0,
+        ).add(const Duration(days: 1));
+      }
+      // If before 7 AM, jump to today 7 AM (only happens if 'now' was early morning)
+      else if (scheduledDate.hour < 7) {
+        scheduledDate = tz.TZDateTime(
+          tz.local,
+          scheduledDate.year,
+          scheduledDate.month,
+          scheduledDate.day,
+          7, // 7:00 AM
+          0,
         );
-    const NotificationDetails notificationDetails = NotificationDetails(
-      android: androidNotificationDetails,
-    );
-    await flutterLocalNotificationsPlugin.periodicallyShowWithDuration(
-      id: 1, // Distinct ID for each scheduled reminder
-      title: 'Time to Hydrate! 💧',
-      body: 'Your gravity is weakening. Take a sip to stay grounded.',
-      notificationDetails: notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      repeatDurationInterval: Duration(minutes: minutes),
-    );
+      }
+
+      // Schedule the notification
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id: scheduledCount, // Distinct ID
+        title: 'Time to Hydrate! 💧',
+        body: 'Your gravity is weakening. Take a sip to stay grounded.',
+        scheduledDate: scheduledDate,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'hydration_reminders',
+            'Hydration Reminders',
+            channelDescription: 'Reminders to drink water',
+            importance: Importance.high,
+            priority: Priority.high,
+            ticker: 'ticker',
+          ),
+          iOS: DarwinNotificationDetails(
+            sound: 'default.wav',
+            presentSound: true,
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+
+        matchDateTimeComponents: DateTimeComponents
+            .time, // Optional: repeat daily at this time? No, we are scheduling explicitly.
+      );
+
+      scheduledCount++;
+    }
   }
 
   /// Shows an instant notification for testing purposes

@@ -1,6 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import '../features/hydration/pages/home_page.dart';
-import '../features/settings/pages/settings_page.dart';
+// import '../features/settings/pages/settings_page.dart';
 
 part 'app_router.gr.dart';
 
@@ -13,6 +13,6 @@ class AppRouter extends RootStackRouter {
     AutoRoute(page: HomeRoute.page, initial: true, path: '/'),
 
     // Settings route
-    AutoRoute(page: SettingsRoute.page, path: '/settings'),
+    // AutoRoute(page: SettingsRoute.page, path: '/settings'),
   ];
 }
