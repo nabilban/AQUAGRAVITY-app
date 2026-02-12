@@ -151,12 +151,19 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(
+            context,
+          ).colorScheme.outlineVariant.withValues(alpha: 0.05),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -182,9 +189,13 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 ),
               ),
               const Gap(AppDimens.x3),
-              const Text(
+              Text(
                 'Daily Goal',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -194,7 +205,10 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Expanded(
                 child: Text(
                   'Target (ml)',
-                  style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ),
               SizedBox(
@@ -204,20 +218,26 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   onChanged: (_) {}, // Let ListenableBuilder update save button
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey.shade50,
+                    fillColor: Theme.of(context).colorScheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(
+                        width: 2,
+                        color: Theme.of(context).colorScheme.outlineVariant,
+                      ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -239,16 +259,24 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           Container(
             padding: const EdgeInsets.all(AppDimens.x3),
             decoration: BoxDecoration(
-              color: Colors.amber.shade50,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.amber.withValues(alpha: 0.1)
+                  : Colors.amber.shade50,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.amber.shade200),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.amber.withValues(alpha: 0.3)
+                    : Colors.amber.shade200,
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.lightbulb_outline,
                   size: 16,
-                  color: Colors.amber.shade700,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.amber.shade400
+                      : Colors.amber.shade700,
                 ),
                 const Gap(AppDimens.x2),
                 Expanded(
@@ -256,7 +284,9 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     'Recommended: 2000-3000 ml per day for adults',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Colors.amber.shade900,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.amber.shade100
+                          : Colors.amber.shade900,
                     ),
                   ),
                 ),
@@ -272,12 +302,19 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: Theme.of(
+            context,
+          ).colorScheme.outlineVariant.withValues(alpha: 0.05),
+          width: 2,
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.2),
+            color: Theme.of(
+              context,
+            ).colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -303,9 +340,13 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 ),
               ),
               const Gap(AppDimens.x3),
-              const Text(
+              Text(
                 'Reminders',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ],
           ),
@@ -315,7 +356,10 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             children: [
               Text(
                 'Enable reminders',
-                style: TextStyle(fontSize: 16, color: Colors.grey.shade700),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
               ValueListenableBuilder<bool>(
                 valueListenable: _remindersEnabledNotifier,
@@ -334,7 +378,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               ),
             ],
           ),
-          const Gap(AppDimens.x4),
+          const Gap(AppDimens.x2),
           ValueListenableBuilder<bool>(
             valueListenable: _remindersEnabledNotifier,
             builder: (context, remindersEnabled, _) {
@@ -345,7 +389,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       'Interval (minutes)',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade700,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -358,26 +402,42 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       enabled: remindersEnabled,
                       onChanged:
                           (_) {}, // Let ListenableBuilder update save button
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: remindersEnabled
-                            ? Colors.grey.shade50
-                            : Colors.grey.shade100,
+                            ? Theme.of(
+                                context,
+                              ).colorScheme.surfaceContainerHighest
+                            : Theme.of(
+                                context,
+                              ).disabledColor.withValues(alpha: 0.1),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(
+                            width: 2,
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(
+                            width: 2,
+                            color: Theme.of(context).colorScheme.outlineVariant,
+                          ),
                         ),
                         disabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade200),
+                          borderSide: BorderSide(
+                            width: 2,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.outlineVariant.withValues(alpha: 0.2),
+                          ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -397,36 +457,45 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               );
             },
           ),
-          const Gap(AppDimens.x4),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton.icon(
-              onPressed: () {
-                context.read<HydrationCubit>().testNotification();
-              },
-              icon: const Icon(Icons.notifications_active_outlined),
-              label: const Text('Test Immediate Notification'),
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                foregroundColor: Theme.of(context).colorScheme.primary,
-              ),
-            ),
-          ),
+          // Dev Only
+          // const Gap(AppDimens.x4),
+          // SizedBox(
+          //   width: double.infinity,
+          //   child: OutlinedButton.icon(
+          //     onPressed: () {
+          //       context.read<HydrationCubit>().testNotification();
+          //     },
+          //     icon: const Icon(Icons.notifications_active_outlined),
+          //     label: const Text('Test Immediate Notification'),
+          //     style: OutlinedButton.styleFrom(
+          //       padding: const EdgeInsets.symmetric(vertical: 12),
+          //       side: BorderSide(color: Theme.of(context).colorScheme.primary),
+          //       foregroundColor: Theme.of(context).colorScheme.primary,
+          //     ),
+          //   ),
+          // ),
           const Gap(AppDimens.x4),
           Container(
             padding: const EdgeInsets.all(AppDimens.x3),
             decoration: BoxDecoration(
-              color: Colors.orange.shade50,
+              color: Theme.of(context).brightness == Brightness.dark
+                  ? Colors.orange.withValues(alpha: 0.1)
+                  : Colors.orange.shade50,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: Colors.orange.shade200),
+              border: Border.all(
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.orange.withValues(alpha: 0.3)
+                    : Colors.orange.shade200,
+              ),
             ),
             child: Row(
               children: [
                 Icon(
                   Icons.warning_amber,
                   size: 16,
-                  color: Colors.orange.shade700,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? Colors.orange.shade400
+                      : Colors.orange.shade700,
                 ),
                 const Gap(AppDimens.x2),
                 Expanded(
@@ -434,7 +503,9 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     'Browser notifications require permission and may not work on all devices',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Colors.orange.shade900,
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.orange.shade100
+                          : Colors.orange.shade900,
                     ),
                   ),
                 ),
@@ -494,6 +565,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 padding: const EdgeInsets.symmetric(vertical: AppDimens.x4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(
+                    color: hasChanges
+                        ? Theme.of(context).colorScheme.primary
+                        : Theme.of(context).colorScheme.outline,
+                    width: 2,
+                  ),
                 ),
               ),
               child: Row(

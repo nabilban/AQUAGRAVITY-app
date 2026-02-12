@@ -94,13 +94,18 @@ class HistoryPage extends StatelessWidget {
             // History Section Header
             Row(
               children: [
-                const Icon(Icons.calendar_today, size: 20),
+                Icon(
+                  Icons.calendar_today,
+                  size: 20,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 const Gap(AppDimens.x2),
                 Text(
                   'History',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
               ],
             ),
@@ -301,7 +306,7 @@ class HistoryPage extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -315,9 +320,10 @@ class HistoryPage extends StatelessWidget {
             children: [
               Text(
                 date,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
               Row(
@@ -347,7 +353,10 @@ class HistoryPage extends StatelessWidget {
           const Gap(AppDimens.x2),
           Text(
             '${amount.toInt()} ml / ${goal.toInt()} ml',
-            style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              fontSize: 14,
+            ),
           ),
           if (isGoalMet)
             Padding(
@@ -357,13 +366,13 @@ class HistoryPage extends StatelessWidget {
                   Icon(
                     Icons.celebration,
                     size: 14,
-                    color: Colors.grey.shade600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                   const Gap(AppDimens.x1),
                   Text(
                     'Goal met',
                     style: TextStyle(
-                      color: Colors.grey.shade600,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
                     ),
@@ -401,13 +410,13 @@ class HistoryPage extends StatelessWidget {
             Icon(
               Icons.calendar_today_outlined,
               size: 80,
-              color: Colors.grey.shade300,
+              color: Theme.of(context).colorScheme.outlineVariant,
             ),
             const Gap(AppDimens.x4),
             Text(
               'No history yet',
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
@@ -416,7 +425,10 @@ class HistoryPage extends StatelessWidget {
             Text(
               'Start tracking your water intake to see your history',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                fontSize: 14,
+              ),
             ),
           ],
         ),

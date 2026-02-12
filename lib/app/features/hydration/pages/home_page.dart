@@ -341,7 +341,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           width: tabWidth,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onPrimary,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
@@ -415,9 +415,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           horizontal: AppDimens.x2,
         ),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(
-            alpha: 0.25,
-          ), // Transparent to show sliding indicator
+          color: Theme.of(
+            context,
+          ).colorScheme.onPrimary.withValues(alpha: 0.25),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -544,9 +544,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           const Gap(AppDimens.x1),
           Text(
             'of ${dailyGoal.toInt()} ml daily goal',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: Theme.of(context).colorScheme.primary,
+            ),
           ),
           const Gap(AppDimens.x2),
 
@@ -589,16 +589,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(
+                      Icon(
                         Icons.celebration,
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onPrimary,
                         size: 20,
                       ),
                       const Gap(AppDimens.x2),
-                      const Text(
+                      Text(
                         'Goal Achieved! 🎉',
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onPrimary,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
@@ -641,7 +641,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           'Quick Add',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w800,
-            color: Colors.grey.shade800,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const Gap(AppDimens.x3),
@@ -710,12 +710,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ),
         child: Column(
           children: [
-            Icon(icon, color: Colors.white, size: 32),
+            Icon(icon, color: Theme.of(context).colorScheme.surface, size: 32),
             const Gap(AppDimens.x2),
             Text(
               label,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.surface,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),
@@ -723,7 +723,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const Gap(4),
             Text(
               amount,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.surface,
+                fontSize: 12,
+              ),
             ),
           ],
         ),
@@ -739,7 +742,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           'Custom Amount',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w800,
-            color: Colors.grey.shade800,
+            color: Theme.of(context).colorScheme.onSurface,
           ),
         ),
         const Gap(AppDimens.x3),
@@ -747,19 +750,37 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           children: [
             Expanded(
               child: TextField(
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
                 controller: _customAmountController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   hintText: 'Enter ml',
                   filled: true,
-                  fillColor: Colors.grey.shade100,
+                  fillColor: Theme.of(
+                    context,
+                  ).colorScheme.secondary.withValues(alpha: 0.1),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: AppDimens.x4,
                     vertical: AppDimens.x3,
+                  ),
+                  hintStyle: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -803,13 +824,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               'Today\'s Log',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w900,
-                color: Colors.grey.shade800,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             if (logs.isNotEmpty)
               Text(
                 '${logs.length} ${logs.length == 1 ? 'entry' : 'entries'}',
-                style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  fontSize: 12,
+                ),
               ),
           ],
         ),
@@ -823,12 +847,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Icon(
                     Icons.water_drop_outlined,
                     size: 64,
-                    color: Colors.grey.shade300,
+                    color: Theme.of(context).colorScheme.outline,
                   ),
                   const Gap(AppDimens.x3),
                   Text(
                     'No water logged yet today',
-                    style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
               ),
@@ -845,10 +872,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   alignment: Alignment.centerRight,
                   padding: const EdgeInsets.only(right: AppDimens.x4),
                   decoration: BoxDecoration(
-                    color: Colors.red,
+                    color: Theme.of(context).colorScheme.error,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.delete, color: Colors.white),
+                  child: Icon(
+                    Icons.delete,
+                    color: Theme.of(context).colorScheme.onError,
+                  ),
                 ),
                 onDismissed: (_) {
                   context.read<HydrationCubit>().deleteLog(log.id);
@@ -859,9 +889,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     vertical: AppDimens.x3,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.grey.shade200),
+                    border: Border.all(
+                      width: 2,
+                      color: Theme.of(context).colorScheme.outlineVariant,
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -877,15 +910,18 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           children: [
                             Text(
                               '${log.amount.toInt()} ml',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 15,
+                                color: Theme.of(context).colorScheme.onSurface,
                               ),
                             ),
                             Text(
                               '${log.timestamp.hour}:${log.timestamp.minute.toString().padLeft(2, '0')}',
                               style: TextStyle(
-                                color: Colors.grey.shade600,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                                 fontSize: 12,
                               ),
                             ),
@@ -898,7 +934,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           child: Icon(
                             Icons.note,
                             size: 14,
-                            color: Colors.grey.shade400,
+                            color: Theme.of(context).colorScheme.outline,
                           ),
                         ),
                     ],

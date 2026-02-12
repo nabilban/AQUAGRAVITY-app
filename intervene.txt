@@ -1,7 +1,8 @@
-4 x counts of intervention
+5 x counts of intervention
 
 1 .  adding alarm permision in manifest for local notification 
 2 .  fixing the ui to more liking (color and animation);
 3 .  deleteing unused pages (settings_page.dart)
 4 .  fixing null error in history page (when there is no data)
+5 .  fixing the ui colors once more for dark theme
 
