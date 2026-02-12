@@ -140,6 +140,7 @@ class HydrationCubit extends Cubit<HydrationState> {
           (_) {
             if (enabled) {
               _notificationService.requestPermissions();
+              _notificationService.requestExactAlarmPermissions();
             }
           },
         );
@@ -167,6 +168,7 @@ class HydrationCubit extends Cubit<HydrationState> {
   /// Trigger a test notification
   Future<void> testNotification() async {
     await _notificationService.requestPermissions();
+    await _notificationService.requestExactAlarmPermissions();
     await _notificationService.showInstantNotification();
   }
 

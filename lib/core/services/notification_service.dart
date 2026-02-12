@@ -16,6 +16,7 @@ class NotificationService {
 
   Future<void> init() async {
     tz.initializeTimeZones();
+    tz.setLocalLocation(tz.getLocation('Asia/Jakarta'));
 
     const AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -58,9 +59,24 @@ class NotificationService {
               .resolvePlatformSpecificImplementation<
                 AndroidFlutterLocalNotificationsPlugin
               >();
-
       final bool? granted = await androidImplementation
           ?.requestNotificationsPermission();
+      return granted ?? false;
+    }
+    return false;
+  }
+
+  Future<bool> requestExactAlarmPermissions() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      return true;
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+          flutterLocalNotificationsPlugin
+              .resolvePlatformSpecificImplementation<
+                AndroidFlutterLocalNotificationsPlugin
+              >();
+      final bool? granted = await androidImplementation
+          ?.requestExactAlarmsPermission();
       return granted ?? false;
     }
     return false;
@@ -69,45 +85,31 @@ class NotificationService {
   /// Schedules a notification to appear [minutes] from now
   Future<void> scheduleReminder(int minutes) async {
     await cancelAllNotifications(); // Cancel previous schedules to avoid clutter
-
-    // Safety check for invalid interval
-    if (minutes <= 0) return;
-
-    // Calculate how many notifications to schedule to cover ~12 hours
-    // But cap at 50 to avoid hitting OS limits (iOS limit is 64 pending, Android varies)
-    const int maxDurationMinutes = 12 * 60; // 12 hours coverage
-    final int calculatedCount = (maxDurationMinutes / minutes).ceil();
-    final int count = calculatedCount > 50 ? 50 : calculatedCount;
-
-    for (int i = 1; i <= count; i++) {
-      final scheduledDate = tz.TZDateTime.now(
-        tz.local,
-      ).add(Duration(minutes: minutes * i));
-
-      await flutterLocalNotificationsPlugin.zonedSchedule(
-        id: i, // Distinct ID for each scheduled reminder
-        title: 'Time to Hydrate! 💧',
-        body: 'Your gravity is weakening. Take a sip to stay grounded.',
-        scheduledDate: scheduledDate,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'hydration_reminders',
-            'Hydration Reminders',
-            channelDescription: 'Reminders to drink water',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-          iOS: DarwinNotificationDetails(),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        matchDateTimeComponents:
-            null, // Don't repeat individually; let the loop handle the sequence
-      );
-    }
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+          'hydration_reminders',
+          'Hydration Reminders',
+          channelDescription: 'Reminders to drink water',
+          importance: Importance.high,
+          priority: Priority.high,
+          ticker: 'ticker',
+        );
+    const NotificationDetails notificationDetails = NotificationDetails(
+      android: androidNotificationDetails,
+    );
+    await flutterLocalNotificationsPlugin.periodicallyShowWithDuration(
+      id: 1, // Distinct ID for each scheduled reminder
+      title: 'Time to Hydrate! 💧',
+      body: 'Your gravity is weakening. Take a sip to stay grounded.',
+      notificationDetails: notificationDetails,
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      repeatDurationInterval: Duration(minutes: minutes),
+    );
   }
 
   /// Shows an instant notification for testing purposes
   Future<void> showInstantNotification() async {
+    await cancelAllNotifications(); // Cancel previous schedules to avoid clutter
     const AndroidNotificationDetails androidNotificationDetails =
         AndroidNotificationDetails(
           'hydration_reminders',
@@ -120,9 +122,8 @@ class NotificationService {
     const NotificationDetails notificationDetails = NotificationDetails(
       android: androidNotificationDetails,
     );
-
     await flutterLocalNotificationsPlugin.show(
-      id: 1, // Distinct ID for test notification
+      id: 2, // Distinct ID for test notification
       title: 'Test Notification 🧪',
       body: 'This is how your hydration reminders will look!',
       notificationDetails: notificationDetails,
