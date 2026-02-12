@@ -97,9 +97,9 @@ extension HydrationLogCompanionX on HydrationLog {
   HydrationLogsCompanion toCompanion() {
     return HydrationLogsCompanion.insert(
       uuid: this.id,
-      amount: this.amount,
-      timestamp: this.timestamp,
-      note: Value(this.note),
+      amount: amount,
+      timestamp: timestamp,
+      note: Value(note),
     );
   }
 }

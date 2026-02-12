@@ -32,12 +32,18 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     super.dispose();
   }
 
-  void _initializeFromState(double dailyGoal) {
+  void _initializeFromState(
+    double dailyGoal,
+    bool reminderEnabled,
+    int reminderInterval,
+  ) {
     if (!_isInitialized) {
       _originalDailyGoal = dailyGoal;
       _dailyGoalController.text = dailyGoal.toInt().toString();
-      _intervalController.text = _originalInterval.toString();
-      _remindersEnabled = _originalRemindersEnabled;
+      _originalRemindersEnabled = reminderEnabled;
+      _originalInterval = reminderInterval;
+      _remindersEnabled = reminderEnabled;
+      _intervalController.text = reminderInterval.toString();
       _isInitialized = true;
     }
   }
@@ -63,8 +69,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         return state.when(
           initial: () => const Center(child: CircularProgressIndicator()),
           loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (logs, todayTotal, dailyGoal) {
-            _initializeFromState(dailyGoal);
+          loaded: (logs, todayTotal, dailyGoal, reminderEnabled, reminderInterval) {
+            _initializeFromState(dailyGoal, reminderEnabled, reminderInterval);
             return _buildContent(context, dailyGoal);
           },
           error: (message) => Center(
@@ -131,7 +137,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -145,7 +151,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00BCD4).withOpacity(0.1),
+                  color: const Color(0xFF00BCD4).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -251,7 +257,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         border: Border.all(color: Colors.grey.shade300),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
+            color: Colors.grey.withValues(alpha: 0.2),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -265,7 +271,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF2196F3).withOpacity(0.1),
+                  color: const Color(0xFF2196F3).withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
@@ -296,8 +302,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     _remindersEnabled = value;
                   });
                 },
-                activeTrackColor: const Color(0xFF00BCD4).withOpacity(0.5),
-                activeColor: const Color(0xFF00BCD4),
+                activeTrackColor: const Color(0xFF00BCD4).withValues(alpha: 0.5),
+                activeThumbColor: const Color(0xFF00BCD4),
               ),
             ],
           ),
@@ -357,6 +363,22 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             ],
           ),
           const Gap(AppDimens.x4),
+          SizedBox(
+            width: double.infinity,
+             child: OutlinedButton.icon(
+              onPressed: () {
+                context.read<HydrationCubit>().testNotification();
+              },
+              icon: const Icon(Icons.notifications_active_outlined),
+              label: const Text('Test Immediate Notification'),
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: const BorderSide(color: Color(0xFF2196F3)),
+                foregroundColor: const Color(0xFF2196F3),
+              ),
+            ),
+          ),
+          const Gap(AppDimens.x4),
           Container(
             padding: const EdgeInsets.all(AppDimens.x3),
             decoration: BoxDecoration(
@@ -405,7 +427,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           boxShadow: hasChanges
               ? [
                   BoxShadow(
-                    color: const Color(0xFF00BCD4).withOpacity(0.3),
+                    color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -505,7 +527,20 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     final dailyGoal = double.tryParse(_dailyGoalController.text);
 
     if (dailyGoal != null && dailyGoal > 0) {
-      context.read<HydrationCubit>().updateDailyGoal(dailyGoal);
+      final cubit = context.read<HydrationCubit>();
+      
+      if (dailyGoal != _originalDailyGoal) {
+        cubit.updateDailyGoal(dailyGoal);
+      }
+      
+      if (_remindersEnabled != _originalRemindersEnabled) {
+        cubit.toggleReminders(_remindersEnabled);
+      }
+      
+      final interval = int.tryParse(_intervalController.text);
+      if (interval != null && interval != _originalInterval) {
+        cubit.updateReminderInterval(interval);
+      }
 
       // Update original values after successful save
       setState(() {

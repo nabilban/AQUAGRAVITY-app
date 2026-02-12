@@ -7,12 +7,17 @@ import 'app/features/hydration/cubit/hydration_cubit.dart';
 import 'app/features/settings/cubit/theme_cubit.dart';
 import 'app/features/settings/cubit/theme_state.dart';
 
+import 'core/services/notification_service.dart';
+
 /// Bootstrap the application
 Future<void> bootstrap({required String environment}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize dependency injection
   await configureDependencies();
+
+  // Initialize notifications
+  await NotificationService().init();
 
   runApp(AquaGravityApp(environment: environment));
 }

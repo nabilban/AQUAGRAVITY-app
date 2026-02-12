@@ -16,7 +16,7 @@ class HistoryPage extends StatelessWidget {
         return state.when(
           initial: () => const Center(child: Text('Initializing...')),
           loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (logs, todayTotal, dailyGoal) =>
+          loaded: (logs, todayTotal, dailyGoal, p3, p4) =>
               _buildLoadedView(context, logs, todayTotal, dailyGoal),
           error: (message) => Center(
             child: Column(
@@ -115,7 +115,7 @@ class HistoryPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00BCD4).withOpacity(0.3),
+            color: const Color(0xFF00BCD4).withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -208,7 +208,7 @@ class HistoryPage extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
