@@ -144,6 +144,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   todayTotal,
                   dailyGoal,
                   theme,
+                  width,
+                  height,
                 ),
             error: (message) => Center(
               child: Column(
@@ -174,6 +176,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double todayTotal,
     double dailyGoal,
     ThemeData theme,
+    double width,
+    double height,
   ) {
     final progress = (todayTotal / dailyGoal).clamp(0.0, 1.0);
 
@@ -188,7 +192,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       children: [
         // Gradient Header with Navigation
         // Gradient Header with Navigation
-        _buildHeader(context, theme),
+        _buildHeader(context, theme, height),
 
         // Content based on selected tab with fade animation
         Expanded(
@@ -212,6 +216,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       dailyGoal,
                       progress,
                       theme,
+                      width,
+                      height,
                     ),
                   )
                 : _selectedTab == 1
@@ -241,6 +247,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double dailyGoal,
     double progress,
     ThemeData theme,
+    double width,
+    double height,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -251,7 +259,13 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             const Gap(AppDimens.x6),
 
             // Circular Progress Indicator
-            _buildCircularProgress(context, todayTotal, dailyGoal, progress),
+            _buildCircularProgress(
+              context,
+              todayTotal,
+              dailyGoal,
+              progress,
+              width,
+            ),
             const Gap(AppDimens.x8),
 
             // Quick Add Section
@@ -283,7 +297,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return const SettingsPageContent();
   }
 
-  Widget _buildHeader(BuildContext context, ThemeData theme) {
+  Widget _buildHeader(BuildContext context, ThemeData theme, double height) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -298,7 +312,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           padding: const EdgeInsets.only(
             left: AppDimens.x4,
             right: AppDimens.x4,
-            top: AppDimens.x4,
+            top: 0,
             bottom: 0,
           ),
           child: Column(
@@ -339,8 +353,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                 ],
               ),
-              const Gap(AppDimens.x4),
-
+              const Gap(AppDimens.x1),
               // Navigation Tabs with Sliding Indicator
               SizedBox(
                 height: 70,
@@ -474,15 +487,17 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double todayTotal,
     double dailyGoal,
     double progress,
+    double width,
   ) {
     final isComplete = progress >= 1.0;
+    final size = width * 0.48; // Responsive size
 
     return Center(
       child: Column(
         children: [
           SizedBox(
-            width: 200,
-            height: 200,
+            width: size,
+            height: size,
             child: Stack(
               alignment: Alignment.center,
               children: [
@@ -491,8 +506,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   animation: _progressAnimation,
                   builder: (context, child) {
                     return SizedBox(
-                      width: 200,
-                      height: 200,
+                      width: size,
+                      height: size,
                       child: CircularProgressIndicator(
                         value: _progressAnimation.value,
                         strokeWidth: 18,

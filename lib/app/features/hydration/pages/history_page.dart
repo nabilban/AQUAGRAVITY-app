@@ -38,6 +38,8 @@ class HistoryPage extends StatelessWidget {
                 todayTotal,
                 dailyGoal,
                 theme,
+                width,
+                height,
               ),
           error: (message) => Center(
             child: Column(
@@ -72,6 +74,8 @@ class HistoryPage extends StatelessWidget {
     double todayTotal,
     double dailyGoal,
     ThemeData theme,
+    double width,
+    double height,
   ) {
     // Group logs by date
     final Map<int, List<HydrationLog>> groupedLogs = {};
@@ -100,7 +104,7 @@ class HistoryPage extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(AppDimens.x4),
+        padding: EdgeInsets.all(width * 0.04),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -111,7 +115,7 @@ class HistoryPage extends StatelessWidget {
               daysTracked: daysTracked,
               theme,
             ),
-            const Gap(AppDimens.x6),
+            Gap(height * 0.03),
 
             // History Section Header
             Row(

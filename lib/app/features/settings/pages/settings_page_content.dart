@@ -111,7 +111,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   wakeUpHour,
                 );
 
-                return _buildContent(context, dailyGoal, theme);
+                return _buildContent(context, dailyGoal, theme, width, height);
               },
           error: (message) => Center(
             child: Column(
@@ -146,6 +146,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     BuildContext context,
     double currentDailyGoal,
     ThemeData theme,
+    double width,
+    double height,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -156,11 +158,11 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             const Gap(AppDimens.x4),
 
             // Daily Goal Card
-            _buildDailyGoalCard(context, theme),
+            _buildDailyGoalCard(context, theme, width),
             const Gap(AppDimens.x4),
 
             // Reminders Card
-            _buildRemindersCard(context, theme),
+            _buildRemindersCard(context, theme, width),
             const Gap(AppDimens.x4),
 
             // Sleep Schedule Card
@@ -180,7 +182,11 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildDailyGoalCard(BuildContext context, ThemeData theme) {
+  Widget _buildDailyGoalCard(
+    BuildContext context,
+    ThemeData theme,
+    double width,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
@@ -239,7 +245,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 ),
               ),
               SizedBox(
-                width: 120,
+                width: width * 0.3,
                 child: TextField(
                   controller: _dailyGoalController,
                   keyboardType: TextInputType.number,
@@ -328,7 +334,11 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildRemindersCard(BuildContext context, ThemeData theme) {
+  Widget _buildRemindersCard(
+    BuildContext context,
+    ThemeData theme,
+    double width,
+  ) {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
@@ -418,7 +428,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     ),
                   ),
                   SizedBox(
-                    width: 120,
+                    width: width * 0.3,
                     child: TextField(
                       controller: _intervalController,
                       keyboardType: TextInputType.number,
