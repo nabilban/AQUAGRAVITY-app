@@ -155,8 +155,6 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Gap(AppDimens.x4),
-
             // Daily Goal Card
             _buildDailyGoalCard(context, theme, width),
             const Gap(AppDimens.x4),

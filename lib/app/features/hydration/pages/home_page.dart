@@ -29,7 +29,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late Animation<double> _floatingAnimation;
   late AnimationController _celebrationAnimationController;
   late Animation<double> _celebrationAnimation;
+  late PageController _pageController;
   bool _hasReached100 = false;
+  bool _isTabSwitching = false;
 
   @override
   void initState() {
@@ -72,6 +74,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         curve: Curves.easeInOut,
       ),
     );
+
+    _pageController = PageController(initialPage: _selectedTab);
   }
 
   @override
@@ -79,6 +83,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _progressAnimationController.dispose();
     _floatingAnimationController.dispose();
     _celebrationAnimationController.dispose();
+    _pageController.dispose();
 
     _customAmountController.dispose();
     super.dispose();
@@ -112,7 +117,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     if (_selectedTab != newTab) {
       setState(() {
         _selectedTab = newTab;
+        _isTabSwitching = true;
       });
+      _pageController
+          .animateToPage(
+            newTab,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          )
+          .then((_) {
+            if (mounted) {
+              setState(() {
+                _isTabSwitching = false;
+              });
+            }
+          });
     }
   }
 
@@ -196,44 +215,29 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
         // Content based on selected tab with fade animation
         Expanded(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            switchInCurve: Curves.easeOut,
-            switchOutCurve: Curves.easeIn,
-            layoutBuilder: (currentChild, previousChildren) {
-              return Stack(
-                alignment: Alignment.topCenter,
-                children: <Widget>[...previousChildren, ?currentChild],
-              );
+          child: PageView(
+            controller: _pageController,
+            onPageChanged: (index) {
+              if (!_isTabSwitching) {
+                setState(() {
+                  _selectedTab = index;
+                });
+              }
             },
-            child: _selectedTab == 0
-                ? KeyedSubtree(
-                    key: const ValueKey(0),
-                    child: _buildTrackerContent(
-                      context,
-                      logs,
-                      todayTotal,
-                      dailyGoal,
-                      progress,
-                      theme,
-                      width,
-                      height,
-                    ),
-                  )
-                : _selectedTab == 1
-                ? KeyedSubtree(
-                    key: const ValueKey(1),
-                    child: _buildHistoryContent(
-                      context,
-                      logs,
-                      todayTotal,
-                      dailyGoal,
-                    ),
-                  )
-                : KeyedSubtree(
-                    key: const ValueKey(2),
-                    child: _buildSettingsContent(context),
-                  ),
+            children: [
+              _buildTrackerContent(
+                context,
+                logs,
+                todayTotal,
+                dailyGoal,
+                progress,
+                theme,
+                width,
+                height,
+              ),
+              _buildHistoryContent(context, logs, todayTotal, dailyGoal),
+              _buildSettingsContent(context),
+            ],
           ),
         ),
       ],
@@ -256,7 +260,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Gap(AppDimens.x6),
+            const Gap(AppDimens.x3),
 
             // Circular Progress Indicator
             _buildCircularProgress(
@@ -266,18 +270,19 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               progress,
               width,
             ),
-            const Gap(AppDimens.x8),
+            const Gap(AppDimens.x4),
 
             // Quick Add Section
             _buildQuickAddSection(context),
-            const Gap(AppDimens.x6),
+            const Gap(AppDimens.x3),
 
             // Custom Amount Section
             _buildCustomAmountSection(context),
-            const Gap(AppDimens.x8),
+            const Gap(AppDimens.x4),
 
             // Today's Log Section
             _buildTodaysLogSection(context, logs),
+            const Gap(AppDimens.x4),
           ],
         ),
       ),
@@ -305,132 +310,132 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        // No borderRadius - straight edge at the bottom
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(28),
+          bottomRight: Radius.circular(28),
+        ),
       ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.only(
-            left: AppDimens.x4,
-            right: AppDimens.x4,
-            top: 0,
-            bottom: 0,
-          ),
-          child: Column(
-            children: [
-              // Logo and Title
-              Row(
-                children: [
-                  Icon(
-                    Icons.water_drop,
+      child: Padding(
+        padding: const EdgeInsets.only(
+          left: AppDimens.x4,
+          right: AppDimens.x4,
+          top: AppDimens.x8,
+          bottom: AppDimens.x6,
+        ),
+        child: Column(
+          children: [
+            // Logo and Title
+            Row(
+              children: [
+                Icon(
+                  Icons.water_drop,
+                  color: theme.colorScheme.onPrimary,
+                  size: 32,
+                ),
+                const Gap(AppDimens.x2),
+                Text(
+                  'AQUAGRAVITY',
+                  style: theme.textTheme.headlineSmall?.copyWith(
                     color: theme.colorScheme.onPrimary,
-                    size: 32,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
                   ),
-                  const Gap(AppDimens.x2),
-                  Text(
-                    'AQUAGRAVITY',
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: theme.colorScheme.onPrimary,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
-                  const Spacer(),
-                  BlocBuilder<ThemeCubit, ThemeState>(
-                    builder: (context, state) {
-                      final isDark = state.themeMode == ThemeMode.dark;
-                      return IconButton(
-                        icon: Icon(
-                          isDark ? Icons.light_mode : Icons.dark_mode,
-                          color: theme.colorScheme.onPrimary,
-                        ),
-                        onPressed: () {
-                          context.read<ThemeCubit>().updateTheme(
-                            isDark ? ThemeMode.light : ThemeMode.dark,
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-              const Gap(AppDimens.x1),
-              // Navigation Tabs with Sliding Indicator
-              SizedBox(
-                height: 70,
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final tabWidth =
-                        (constraints.maxWidth - (AppDimens.x2 * 2)) / 3;
-
-                    return Stack(
-                      children: [
-                        // Animated sliding white background
-                        AnimatedPositioned(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                          left: _selectedTab * (tabWidth + AppDimens.x2),
-                          top: 0,
-                          bottom: 0,
-                          width: tabWidth,
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.onPrimary,
-                              borderRadius: BorderRadius.circular(12),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // Tab buttons
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _buildNavTab(
-                                context,
-                                theme,
-                                icon: Icons.water_drop,
-                                label: 'Tracker',
-                                isSelected: _selectedTab == 0,
-                                onTap: () => _switchTab(0),
-                              ),
-                            ),
-                            const Gap(AppDimens.x2),
-                            Expanded(
-                              child: _buildNavTab(
-                                context,
-                                theme,
-                                icon: Icons.history,
-                                label: 'History',
-                                isSelected: _selectedTab == 1,
-                                onTap: () => _switchTab(1),
-                              ),
-                            ),
-                            const Gap(AppDimens.x2),
-                            Expanded(
-                              child: _buildNavTab(
-                                context,
-                                theme,
-                                icon: Icons.settings,
-                                label: 'Settings',
-                                isSelected: _selectedTab == 2,
-                                onTap: () => _switchTab(2),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                ),
+                const Spacer(),
+                BlocBuilder<ThemeCubit, ThemeState>(
+                  builder: (context, state) {
+                    final isDark = state.themeMode == ThemeMode.dark;
+                    return IconButton(
+                      icon: Icon(
+                        isDark ? Icons.light_mode : Icons.dark_mode,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                      onPressed: () {
+                        context.read<ThemeCubit>().updateTheme(
+                          isDark ? ThemeMode.light : ThemeMode.dark,
+                        );
+                      },
                     );
                   },
                 ),
+              ],
+            ),
+            const Gap(AppDimens.x1),
+            // Navigation Tabs with Sliding Indicator
+            SizedBox(
+              height: 70,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final tabWidth =
+                      (constraints.maxWidth - (AppDimens.x2 * 2)) / 3;
+                  return Stack(
+                    children: [
+                      // Animated sliding white background
+                      AnimatedPositioned(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                        left: _selectedTab * (tabWidth + AppDimens.x2),
+                        top: 0,
+                        bottom: 0,
+                        width: tabWidth,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.onPrimary,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Tab buttons
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _buildNavTab(
+                              context,
+                              theme,
+                              icon: Icons.water_drop,
+                              label: 'Tracker',
+                              isSelected: _selectedTab == 0,
+                              onTap: () => _switchTab(0),
+                            ),
+                          ),
+                          const Gap(AppDimens.x2),
+                          Expanded(
+                            child: _buildNavTab(
+                              context,
+                              theme,
+                              icon: Icons.history,
+                              label: 'History',
+                              isSelected: _selectedTab == 1,
+                              onTap: () => _switchTab(1),
+                            ),
+                          ),
+                          const Gap(AppDimens.x2),
+                          Expanded(
+                            child: _buildNavTab(
+                              context,
+                              theme,
+                              icon: Icons.settings,
+                              label: 'Settings',
+                              isSelected: _selectedTab == 2,
+                              onTap: () => _switchTab(2),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -803,14 +808,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     borderSide: BorderSide(
                       color: Theme.of(
                         context,
-                      ).colorScheme.outline.withValues(alpha: 0.5),
+                      ).colorScheme.outlineVariant.withValues(alpha: 0.05),
                       width: 2,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outlineVariant.withValues(alpha: 0.05),
                       width: 2,
                     ),
                   ),
@@ -952,8 +959,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outlineVariant.withValues(alpha: 0.05),
                       width: 2,
-                      color: Theme.of(context).colorScheme.outlineVariant,
                     ),
                   ),
                   child: Row(

@@ -115,7 +115,7 @@ class HistoryPage extends StatelessWidget {
               daysTracked: daysTracked,
               theme,
             ),
-            Gap(height * 0.03),
+            Gap(height * 0.02),
 
             // History Section Header
             Row(
@@ -138,6 +138,7 @@ class HistoryPage extends StatelessWidget {
             // History List
             if (sortedKeys.isNotEmpty)
               ListView.separated(
+                padding: EdgeInsets.only(top: height * 0.01),
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: sortedKeys.length,
