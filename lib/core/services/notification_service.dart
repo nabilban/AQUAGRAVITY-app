@@ -82,8 +82,12 @@ class NotificationService {
     return false;
   }
 
-  /// Schedules smart reminders avoiding 10 PM - 7 AM
-  Future<void> scheduleReminder(int intervalMinutes) async {
+  /// Schedules smart reminders avoiding sleep hours
+  Future<void> scheduleReminder(
+    int intervalMinutes,
+    int bedTimeHour,
+    int wakeUpHour,
+  ) async {
     await cancelAllNotifications();
 
     // Safety check
@@ -99,26 +103,26 @@ class NotificationService {
       // Advance by interval
       scheduledDate = scheduledDate.add(Duration(minutes: intervalMinutes));
 
-      // Check quiet hours (10 PM - 7 AM)
-      // If after 10 PM (22:00), jump to next day 7 AM
-      if (scheduledDate.hour >= 22) {
+      // Check quiet hours
+      // If after bedTime, jump to next day wakeUpHour
+      if (scheduledDate.hour >= bedTimeHour) {
         scheduledDate = tz.TZDateTime(
           tz.local,
           scheduledDate.year,
           scheduledDate.month,
           scheduledDate.day,
-          7, // 7:00 AM
+          wakeUpHour,
           0,
         ).add(const Duration(days: 1));
       }
-      // If before 7 AM, jump to today 7 AM (only happens if 'now' was early morning)
-      else if (scheduledDate.hour < 7) {
+      // If before wakeUpHour, jump to today wakeUpHour (only happens if 'now' was early morning)
+      else if (scheduledDate.hour < wakeUpHour) {
         scheduledDate = tz.TZDateTime(
           tz.local,
           scheduledDate.year,
           scheduledDate.month,
           scheduledDate.day,
-          7, // 7:00 AM
+          wakeUpHour,
           0,
         );
       }

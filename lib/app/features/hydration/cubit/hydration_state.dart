@@ -17,6 +17,8 @@ sealed class HydrationState with _$HydrationState {
     required double dailyGoal,
     required bool reminderEnabled,
     required int reminderInterval,
+    required int bedTimeHour,
+    required int wakeUpHour,
   }) = _Loaded;
 
   const factory HydrationState.error({required String message}) = _Error;

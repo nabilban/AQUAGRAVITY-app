@@ -9,8 +9,10 @@ sealed class UserSettings with _$UserSettings {
   const factory UserSettings({
     required String id,
     @Default(2000.0) double dailyGoal,
-    @Default(true) bool reminderEnabled,
+    @Default(false) bool reminderEnabled,
     @Default(60) int reminderInterval,
+    @Default(22) int bedTimeHour,
+    @Default(7) int wakeUpHour,
   }) = _UserSettings;
 
   factory UserSettings.fromJson(Map<String, dynamic> json) =>

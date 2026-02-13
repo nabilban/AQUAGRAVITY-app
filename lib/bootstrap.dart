@@ -39,6 +39,7 @@ class _AquaGravityAppState extends State<AquaGravityApp> {
   void initState() {
     super.initState();
     _appRouter = AppRouter();
+    NotificationService().requestPermissions();
   }
 
   @override

@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UserSettings {
 
- String get id; double get dailyGoal; bool get reminderEnabled; int get reminderInterval;
+ String get id; double get dailyGoal; bool get reminderEnabled; int get reminderInterval; int get bedTimeHour; int get wakeUpHour;
 /// Create a copy of UserSettings
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,16 +28,16 @@ $UserSettingsCopyWith<UserSettings> get copyWith => _$UserSettingsCopyWithImpl<U
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserSettings&&(identical(other.id, id) || other.id == id)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is UserSettings&&(identical(other.id, id) || other.id == id)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval)&&(identical(other.bedTimeHour, bedTimeHour) || other.bedTimeHour == bedTimeHour)&&(identical(other.wakeUpHour, wakeUpHour) || other.wakeUpHour == wakeUpHour));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,dailyGoal,reminderEnabled,reminderInterval);
+int get hashCode => Object.hash(runtimeType,id,dailyGoal,reminderEnabled,reminderInterval,bedTimeHour,wakeUpHour);
 
 @override
 String toString() {
-  return 'UserSettings(id: $id, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval)';
+  return 'UserSettings(id: $id, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval, bedTimeHour: $bedTimeHour, wakeUpHour: $wakeUpHour)';
 }
 
 
@@ -48,7 +48,7 @@ abstract mixin class $UserSettingsCopyWith<$Res>  {
   factory $UserSettingsCopyWith(UserSettings value, $Res Function(UserSettings) _then) = _$UserSettingsCopyWithImpl;
 @useResult
 $Res call({
- String id, double dailyGoal, bool reminderEnabled, int reminderInterval
+ String id, double dailyGoal, bool reminderEnabled, int reminderInterval, int bedTimeHour, int wakeUpHour
 });
 
 
@@ -65,12 +65,14 @@ class _$UserSettingsCopyWithImpl<$Res>
 
 /// Create a copy of UserSettings
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,Object? bedTimeHour = null,Object? wakeUpHour = null,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,dailyGoal: null == dailyGoal ? _self.dailyGoal : dailyGoal // ignore: cast_nullable_to_non_nullable
 as double,reminderEnabled: null == reminderEnabled ? _self.reminderEnabled : reminderEnabled // ignore: cast_nullable_to_non_nullable
 as bool,reminderInterval: null == reminderInterval ? _self.reminderInterval : reminderInterval // ignore: cast_nullable_to_non_nullable
+as int,bedTimeHour: null == bedTimeHour ? _self.bedTimeHour : bedTimeHour // ignore: cast_nullable_to_non_nullable
+as int,wakeUpHour: null == wakeUpHour ? _self.wakeUpHour : wakeUpHour // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }
@@ -153,10 +155,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval,  int bedTimeHour,  int wakeUpHour)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _UserSettings() when $default != null:
-return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _:
+return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval,_that.bedTimeHour,_that.wakeUpHour);case _:
   return orElse();
 
 }
@@ -174,10 +176,10 @@ return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInt
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval,  int bedTimeHour,  int wakeUpHour)  $default,) {final _that = this;
 switch (_that) {
 case _UserSettings():
-return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);}
+return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval,_that.bedTimeHour,_that.wakeUpHour);}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -191,10 +193,10 @@ return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInt
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  double dailyGoal,  bool reminderEnabled,  int reminderInterval,  int bedTimeHour,  int wakeUpHour)?  $default,) {final _that = this;
 switch (_that) {
 case _UserSettings() when $default != null:
-return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval);case _:
+return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInterval,_that.bedTimeHour,_that.wakeUpHour);case _:
   return null;
 
 }
@@ -206,13 +208,15 @@ return $default(_that.id,_that.dailyGoal,_that.reminderEnabled,_that.reminderInt
 @JsonSerializable()
 
 class _UserSettings implements UserSettings {
-  const _UserSettings({required this.id, this.dailyGoal = 2000.0, this.reminderEnabled = true, this.reminderInterval = 60});
+  const _UserSettings({required this.id, this.dailyGoal = 2000.0, this.reminderEnabled = false, this.reminderInterval = 60, this.bedTimeHour = 22, this.wakeUpHour = 7});
   factory _UserSettings.fromJson(Map<String, dynamic> json) => _$UserSettingsFromJson(json);
 
 @override final  String id;
 @override@JsonKey() final  double dailyGoal;
 @override@JsonKey() final  bool reminderEnabled;
 @override@JsonKey() final  int reminderInterval;
+@override@JsonKey() final  int bedTimeHour;
+@override@JsonKey() final  int wakeUpHour;
 
 /// Create a copy of UserSettings
 /// with the given fields replaced by the non-null parameter values.
@@ -227,16 +231,16 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserSettings&&(identical(other.id, id) || other.id == id)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _UserSettings&&(identical(other.id, id) || other.id == id)&&(identical(other.dailyGoal, dailyGoal) || other.dailyGoal == dailyGoal)&&(identical(other.reminderEnabled, reminderEnabled) || other.reminderEnabled == reminderEnabled)&&(identical(other.reminderInterval, reminderInterval) || other.reminderInterval == reminderInterval)&&(identical(other.bedTimeHour, bedTimeHour) || other.bedTimeHour == bedTimeHour)&&(identical(other.wakeUpHour, wakeUpHour) || other.wakeUpHour == wakeUpHour));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
-int get hashCode => Object.hash(runtimeType,id,dailyGoal,reminderEnabled,reminderInterval);
+int get hashCode => Object.hash(runtimeType,id,dailyGoal,reminderEnabled,reminderInterval,bedTimeHour,wakeUpHour);
 
 @override
 String toString() {
-  return 'UserSettings(id: $id, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval)';
+  return 'UserSettings(id: $id, dailyGoal: $dailyGoal, reminderEnabled: $reminderEnabled, reminderInterval: $reminderInterval, bedTimeHour: $bedTimeHour, wakeUpHour: $wakeUpHour)';
 }
 
 
@@ -247,7 +251,7 @@ abstract mixin class _$UserSettingsCopyWith<$Res> implements $UserSettingsCopyWi
   factory _$UserSettingsCopyWith(_UserSettings value, $Res Function(_UserSettings) _then) = __$UserSettingsCopyWithImpl;
 @override @useResult
 $Res call({
- String id, double dailyGoal, bool reminderEnabled, int reminderInterval
+ String id, double dailyGoal, bool reminderEnabled, int reminderInterval, int bedTimeHour, int wakeUpHour
 });
 
 
@@ -264,12 +268,14 @@ class __$UserSettingsCopyWithImpl<$Res>
 
 /// Create a copy of UserSettings
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? dailyGoal = null,Object? reminderEnabled = null,Object? reminderInterval = null,Object? bedTimeHour = null,Object? wakeUpHour = null,}) {
   return _then(_UserSettings(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,dailyGoal: null == dailyGoal ? _self.dailyGoal : dailyGoal // ignore: cast_nullable_to_non_nullable
 as double,reminderEnabled: null == reminderEnabled ? _self.reminderEnabled : reminderEnabled // ignore: cast_nullable_to_non_nullable
 as bool,reminderInterval: null == reminderInterval ? _self.reminderInterval : reminderInterval // ignore: cast_nullable_to_non_nullable
+as int,bedTimeHour: null == bedTimeHour ? _self.bedTimeHour : bedTimeHour // ignore: cast_nullable_to_non_nullable
+as int,wakeUpHour: null == wakeUpHour ? _self.wakeUpHour : wakeUpHour // ignore: cast_nullable_to_non_nullable
 as int,
   ));
 }

@@ -89,6 +89,8 @@ extension UserSettingsEntityX on UserSettingsEntity {
       dailyGoal: dailyGoal,
       reminderEnabled: reminderEnabled,
       reminderInterval: reminderInterval,
+      bedTimeHour: bedTimeHour,
+      wakeUpHour: wakeUpHour,
     );
   }
 }
@@ -101,6 +103,8 @@ extension UserSettingsCompanionX on UserSettings {
       dailyGoal: Value(dailyGoal),
       reminderEnabled: Value(reminderEnabled),
       reminderInterval: Value(reminderInterval),
+      bedTimeHour: Value(bedTimeHour),
+      wakeUpHour: Value(wakeUpHour),
     );
   }
 }

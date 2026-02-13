@@ -9,4 +9,6 @@ class UserSettingsTable extends Table with UuidMixin, MetaMixin {
   BoolColumn get reminderEnabled =>
       boolean().withDefault(const Constant(true))();
   IntColumn get reminderInterval => integer().withDefault(const Constant(60))();
+  IntColumn get bedTimeHour => integer().withDefault(const Constant(22))();
+  IntColumn get wakeUpHour => integer().withDefault(const Constant(7))();
 }

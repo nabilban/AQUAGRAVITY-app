@@ -24,6 +24,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
   double? _originalDailyGoal;
   bool _originalRemindersEnabled = false;
   int _originalInterval = 60;
+  int _originalBedTime = 22;
+  int _originalWakeUpTime = 7;
+
+  // Current values
+  late TimeOfDay _bedTime = const TimeOfDay(hour: 22, minute: 0);
+  late TimeOfDay _wakeUpTime = const TimeOfDay(hour: 7, minute: 0);
 
   bool _isInitialized = false;
 
@@ -39,14 +45,21 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     double dailyGoal,
     bool reminderEnabled,
     int reminderInterval,
+    int bedTimeHour,
+    int wakeUpHour,
   ) {
     if (!_isInitialized) {
       _originalDailyGoal = dailyGoal;
       _dailyGoalController.text = dailyGoal.toInt().toString();
       _originalRemindersEnabled = reminderEnabled;
       _originalInterval = reminderInterval;
+      _originalBedTime = bedTimeHour;
+      _originalWakeUpTime = wakeUpHour;
+
       _remindersEnabledNotifier.value = reminderEnabled;
       _intervalController.text = reminderInterval.toString();
+      _bedTime = TimeOfDay(hour: bedTimeHour, minute: 0);
+      _wakeUpTime = TimeOfDay(hour: wakeUpHour, minute: 0);
       _isInitialized = true;
     }
   }
@@ -62,11 +75,18 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
 
     return currentGoal != _originalDailyGoal ||
         _remindersEnabledNotifier.value != _originalRemindersEnabled ||
-        currentInterval != _originalInterval;
+        currentInterval != _originalInterval ||
+        _bedTime.hour != _originalBedTime ||
+        _wakeUpTime.hour != _originalWakeUpTime;
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+
     return BlocBuilder<HydrationCubit, HydrationState>(
       builder: (context, state) {
         return state.when(
@@ -80,13 +100,18 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 dailyGoal,
                 reminderEnabled,
                 reminderInterval,
+                bedTimeHour,
+                wakeUpHour,
               ) {
                 _initializeFromState(
                   dailyGoal,
                   reminderEnabled,
                   reminderInterval,
+                  bedTimeHour,
+                  wakeUpHour,
                 );
-                return _buildContent(context, dailyGoal);
+
+                return _buildContent(context, dailyGoal, theme);
               },
           error: (message) => Center(
             child: Column(
@@ -117,7 +142,11 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildContent(BuildContext context, double currentDailyGoal) {
+  Widget _buildContent(
+    BuildContext context,
+    double currentDailyGoal,
+    ThemeData theme,
+  ) {
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.all(AppDimens.x4),
@@ -127,43 +156,43 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             const Gap(AppDimens.x4),
 
             // Daily Goal Card
-            _buildDailyGoalCard(context),
+            _buildDailyGoalCard(context, theme),
             const Gap(AppDimens.x4),
 
             // Reminders Card
-            _buildRemindersCard(context),
+            _buildRemindersCard(context, theme),
+            const Gap(AppDimens.x4),
+
+            // Sleep Schedule Card
+            _buildSleepScheduleCard(context, theme),
             const Gap(AppDimens.x6),
 
             // Save Settings Button
-            _buildSaveButton(context),
+            _buildSaveButton(context, theme),
             const Gap(AppDimens.x6),
 
             // Danger Zone
-            _buildDangerZone(context),
-            const Gap(AppDimens.x8),
+            _buildDangerZone(context, theme),
+            const Gap(AppDimens.x10 + AppDimens.x10),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildDailyGoalCard(BuildContext context) {
+  Widget _buildDailyGoalCard(BuildContext context, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.05),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.05),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.05),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -177,14 +206,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.secondary.withValues(alpha: 0.1),
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.track_changes,
-                  color: Theme.of(context).colorScheme.secondary,
+                  color: theme.colorScheme.secondary,
                   size: 24,
                 ),
               ),
@@ -194,7 +221,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
@@ -207,7 +234,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   'Target (ml)',
                   style: TextStyle(
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
               ),
@@ -221,28 +248,31 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Theme.of(context).colorScheme.surface,
+                    fillColor: theme.colorScheme.surface,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.outlineVariant,
+                        color: theme.colorScheme.outlineVariant,
+                        width: 2,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        width: 2,
-                        color: Theme.of(context).colorScheme.outlineVariant,
+                        width: 1,
+                        color: theme.colorScheme.outlineVariant.withValues(
+                          alpha: 0.2,
+                        ),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: Theme.of(context).colorScheme.secondary,
+                        color: theme.colorScheme.outline,
                         width: 2,
                       ),
                     ),
@@ -259,12 +289,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           Container(
             padding: const EdgeInsets.all(AppDimens.x3),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: theme.brightness == Brightness.dark
                   ? Colors.amber.withValues(alpha: 0.1)
                   : Colors.amber.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: theme.brightness == Brightness.dark
                     ? Colors.amber.withValues(alpha: 0.3)
                     : Colors.amber.shade200,
               ),
@@ -274,7 +304,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 Icon(
                   Icons.lightbulb_outline,
                   size: 16,
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: theme.brightness == Brightness.dark
                       ? Colors.amber.shade400
                       : Colors.amber.shade700,
                 ),
@@ -284,7 +314,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     'Recommended: 2000-3000 ml per day for adults',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: theme.brightness == Brightness.dark
                           ? Colors.amber.shade100
                           : Colors.amber.shade900,
                     ),
@@ -298,23 +328,19 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildRemindersCard(BuildContext context) {
+  Widget _buildRemindersCard(BuildContext context, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHigh,
+        color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: Theme.of(
-            context,
-          ).colorScheme.outlineVariant.withValues(alpha: 0.05),
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.05),
           width: 2,
         ),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.onSurface.withValues(alpha: 0.05),
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
             blurRadius: 15,
             offset: const Offset(0, 4),
           ),
@@ -328,14 +354,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Container(
                 padding: const EdgeInsets.all(AppDimens.x3),
                 decoration: BoxDecoration(
-                  color: Theme.of(
-                    context,
-                  ).colorScheme.primary.withValues(alpha: 0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   Icons.notifications_outlined,
-                  color: Theme.of(context).colorScheme.primary,
+                  color: theme.colorScheme.primary,
                   size: 24,
                 ),
               ),
@@ -345,7 +369,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
             ],
@@ -358,7 +382,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 'Enable reminders',
                 style: TextStyle(
                   fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  color: theme.colorScheme.onSurfaceVariant,
                 ),
               ),
               ValueListenableBuilder<bool>(
@@ -369,10 +393,10 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     onChanged: (value) {
                       _remindersEnabledNotifier.value = value;
                     },
-                    activeTrackColor: Theme.of(
-                      context,
-                    ).colorScheme.secondary.withValues(alpha: 0.5),
-                    activeThumbColor: Theme.of(context).colorScheme.secondary,
+                    activeTrackColor: theme.colorScheme.secondary.withValues(
+                      alpha: 0.5,
+                    ),
+                    activeThumbColor: theme.colorScheme.secondary,
                   );
                 },
               ),
@@ -389,7 +413,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       'Interval (minutes)',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -405,44 +429,42 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).colorScheme.onSurface,
+                        color: theme.colorScheme.onSurface,
                       ),
                       decoration: InputDecoration(
                         filled: true,
                         fillColor: remindersEnabled
-                            ? Theme.of(
-                                context,
-                              ).colorScheme.surfaceContainerHighest
-                            : Theme.of(
-                                context,
-                              ).disabledColor.withValues(alpha: 0.1),
+                            ? theme.colorScheme.surfaceContainerHighest
+                            : theme.disabledColor.withValues(alpha: 0.1),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            width: 2,
-                            color: Theme.of(context).colorScheme.outlineVariant,
+                            width: 1,
+                            color: theme.colorScheme.outlineVariant,
                           ),
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            width: 2,
-                            color: Theme.of(context).colorScheme.outlineVariant,
+                            width: 1,
+                            color: theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.2,
+                            ),
                           ),
                         ),
                         disabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            width: 2,
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.outlineVariant.withValues(alpha: 0.2),
+                            width: 1,
+                            color: theme.colorScheme.outlineVariant.withValues(
+                              alpha: 0.2,
+                            ),
                           ),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                           borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.secondary,
+                            color: theme.colorScheme.outline,
                             width: 2,
                           ),
                         ),
@@ -478,12 +500,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
           Container(
             padding: const EdgeInsets.all(AppDimens.x3),
             decoration: BoxDecoration(
-              color: Theme.of(context).brightness == Brightness.dark
+              color: theme.brightness == Brightness.dark
                   ? Colors.orange.withValues(alpha: 0.1)
                   : Colors.orange.shade50,
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: Theme.of(context).brightness == Brightness.dark
+                color: theme.brightness == Brightness.dark
                     ? Colors.orange.withValues(alpha: 0.3)
                     : Colors.orange.shade200,
               ),
@@ -493,7 +515,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 Icon(
                   Icons.warning_amber,
                   size: 16,
-                  color: Theme.of(context).brightness == Brightness.dark
+                  color: theme.brightness == Brightness.dark
                       ? Colors.orange.shade400
                       : Colors.orange.shade700,
                 ),
@@ -503,7 +525,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                     'Browser notifications require permission and may not work on all devices',
                     style: TextStyle(
                       fontSize: 11,
-                      color: Theme.of(context).brightness == Brightness.dark
+                      color: theme.brightness == Brightness.dark
                           ? Colors.orange.shade100
                           : Colors.orange.shade900,
                     ),
@@ -517,7 +539,164 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildSaveButton(BuildContext context) {
+  Widget _buildSleepScheduleCard(BuildContext context, ThemeData theme) {
+    return Container(
+      padding: const EdgeInsets.all(AppDimens.x5),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHigh,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: theme.colorScheme.outlineVariant.withValues(alpha: 0.05),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: theme.colorScheme.onSurface.withValues(alpha: 0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(AppDimens.x3),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.tertiary.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.bedtime,
+                  color: theme.colorScheme.tertiary,
+                  size: 24,
+                ),
+              ),
+              const Gap(AppDimens.x3),
+              Text(
+                'Quiet Hours',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const Gap(AppDimens.x5),
+          Text(
+            'Notifications will be paused during these hours.',
+            style: TextStyle(
+              fontSize: 14,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const Gap(AppDimens.x4),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTimePickerField(
+                  context,
+                  theme,
+                  label: 'Bedtime',
+                  time: _bedTime,
+                  icon: Icons.nightlight_round,
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: _bedTime,
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _bedTime = picked;
+                      });
+                    }
+                  },
+                ),
+              ),
+              const Gap(AppDimens.x4),
+              Expanded(
+                child: _buildTimePickerField(
+                  context,
+                  theme,
+                  label: 'Wake Up',
+                  time: _wakeUpTime,
+                  icon: Icons.wb_sunny_rounded,
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: _wakeUpTime,
+                    );
+                    if (picked != null) {
+                      setState(() {
+                        _wakeUpTime = picked;
+                      });
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimePickerField(
+    BuildContext context,
+    ThemeData theme, {
+    required String label,
+    required TimeOfDay time,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(AppDimens.x3),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            width: 1,
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Icon(icon, size: 16, color: theme.colorScheme.primary),
+                const Gap(AppDimens.x2),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+            const Gap(AppDimens.x2),
+            Text(
+              time.format(context),
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(BuildContext context, ThemeData theme) {
     return ListenableBuilder(
       listenable: Listenable.merge([
         _dailyGoalController,
@@ -525,7 +704,11 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         _intervalController,
       ]),
       builder: (context, _) {
-        final hasChanges = _hasChanges();
+        final hasChanges =
+            _hasChanges(); // Rebuilds on controller changes but not TimeOfDay if not listed?
+        // Actually _hasChanges uses current values from controllers/state.
+        // We need to rebuild when _bedTime changes.
+        // But _bedTime is not a Listenable. We need to setState when picking time.
 
         return AnimatedOpacity(
           opacity: hasChanges ? 1.0 : 0.5,
@@ -534,22 +717,19 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: hasChanges
-                    ? [
-                        Theme.of(context).colorScheme.secondary,
-                        Theme.of(context).colorScheme.primary,
-                      ]
+                    ? [theme.colorScheme.secondary, theme.colorScheme.primary]
                     : [
-                        Theme.of(context).colorScheme.surfaceContainerHighest,
-                        Theme.of(context).colorScheme.outline,
+                        theme.colorScheme.surfaceContainerHighest,
+                        theme.colorScheme.outline,
                       ],
               ),
               borderRadius: BorderRadius.circular(16),
               boxShadow: hasChanges
                   ? [
                       BoxShadow(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.secondary.withValues(alpha: 0.3),
+                        color: theme.colorScheme.secondary.withValues(
+                          alpha: 0.3,
+                        ),
                         blurRadius: 12,
                         offset: const Offset(0, 4),
                       ),
@@ -567,8 +747,8 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                   borderRadius: BorderRadius.circular(16),
                   side: BorderSide(
                     color: hasChanges
-                        ? Theme.of(context).colorScheme.primary
-                        : Theme.of(context).colorScheme.outline,
+                        ? theme.colorScheme.primary
+                        : theme.colorScheme.outline,
                     width: 2,
                   ),
                 ),
@@ -598,17 +778,15 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
     );
   }
 
-  Widget _buildDangerZone(BuildContext context) {
+  Widget _buildDangerZone(BuildContext context, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x5),
       decoration: BoxDecoration(
-        color: Theme.of(
-          context,
-        ).colorScheme.errorContainer.withValues(alpha: 0.2),
+        color: theme.colorScheme.errorContainer.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           width: 2,
-          color: Theme.of(context).colorScheme.error.withValues(alpha: 0.5),
+          color: theme.colorScheme.error.withValues(alpha: 0.5),
         ),
       ),
       child: Column(
@@ -619,7 +797,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Theme.of(context).colorScheme.error,
+              color: theme.colorScheme.error,
             ),
           ),
           const Gap(AppDimens.x4),
@@ -630,7 +808,7 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
                 _showClearDataDialog(context);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.errorContainer,
+                backgroundColor: theme.colorScheme.errorContainer,
                 padding: const EdgeInsets.symmetric(vertical: AppDimens.x4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -639,15 +817,12 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
-                    Icons.delete_forever,
-                    color: Theme.of(context).colorScheme.onError,
-                  ),
+                  Icon(Icons.delete_forever, color: theme.colorScheme.onError),
                   Gap(AppDimens.x2),
                   Text(
                     'Clear All Data',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onError,
+                      color: theme.colorScheme.onError,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -680,11 +855,21 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
         cubit.updateReminderInterval(interval);
       }
 
+      if (_bedTime.hour != _originalBedTime) {
+        cubit.updateBedTime(_bedTime.hour);
+      }
+
+      if (_wakeUpTime.hour != _originalWakeUpTime) {
+        cubit.updateWakeUpTime(_wakeUpTime.hour);
+      }
+
       // Update original values after successful save
       setState(() {
         _originalDailyGoal = dailyGoal;
         _originalRemindersEnabled = _remindersEnabledNotifier.value;
         _originalInterval = int.tryParse(_intervalController.text) ?? 60;
+        _originalBedTime = _bedTime.hour;
+        _originalWakeUpTime = _wakeUpTime.hour;
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

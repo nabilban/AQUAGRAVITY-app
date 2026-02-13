@@ -489,6 +489,30 @@ class $UserSettingsTableTable extends UserSettingsTable
     requiredDuringInsert: false,
     defaultValue: const Constant(60),
   );
+  static const VerificationMeta _bedTimeHourMeta = const VerificationMeta(
+    'bedTimeHour',
+  );
+  @override
+  late final GeneratedColumn<int> bedTimeHour = GeneratedColumn<int>(
+    'bed_time_hour',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(22),
+  );
+  static const VerificationMeta _wakeUpHourMeta = const VerificationMeta(
+    'wakeUpHour',
+  );
+  @override
+  late final GeneratedColumn<int> wakeUpHour = GeneratedColumn<int>(
+    'wake_up_hour',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(7),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     uuid,
@@ -497,6 +521,8 @@ class $UserSettingsTableTable extends UserSettingsTable
     dailyGoal,
     reminderEnabled,
     reminderInterval,
+    bedTimeHour,
+    wakeUpHour,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -554,6 +580,24 @@ class $UserSettingsTableTable extends UserSettingsTable
         ),
       );
     }
+    if (data.containsKey('bed_time_hour')) {
+      context.handle(
+        _bedTimeHourMeta,
+        bedTimeHour.isAcceptableOrUnknown(
+          data['bed_time_hour']!,
+          _bedTimeHourMeta,
+        ),
+      );
+    }
+    if (data.containsKey('wake_up_hour')) {
+      context.handle(
+        _wakeUpHourMeta,
+        wakeUpHour.isAcceptableOrUnknown(
+          data['wake_up_hour']!,
+          _wakeUpHourMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -587,6 +631,14 @@ class $UserSettingsTableTable extends UserSettingsTable
         DriftSqlType.int,
         data['${effectivePrefix}reminder_interval'],
       )!,
+      bedTimeHour: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bed_time_hour'],
+      )!,
+      wakeUpHour: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}wake_up_hour'],
+      )!,
     );
   }
 
@@ -604,6 +656,8 @@ class UserSettingsEntity extends DataClass
   final double dailyGoal;
   final bool reminderEnabled;
   final int reminderInterval;
+  final int bedTimeHour;
+  final int wakeUpHour;
   const UserSettingsEntity({
     required this.uuid,
     required this.createdAt,
@@ -611,6 +665,8 @@ class UserSettingsEntity extends DataClass
     required this.dailyGoal,
     required this.reminderEnabled,
     required this.reminderInterval,
+    required this.bedTimeHour,
+    required this.wakeUpHour,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -623,6 +679,8 @@ class UserSettingsEntity extends DataClass
     map['daily_goal'] = Variable<double>(dailyGoal);
     map['reminder_enabled'] = Variable<bool>(reminderEnabled);
     map['reminder_interval'] = Variable<int>(reminderInterval);
+    map['bed_time_hour'] = Variable<int>(bedTimeHour);
+    map['wake_up_hour'] = Variable<int>(wakeUpHour);
     return map;
   }
 
@@ -636,6 +694,8 @@ class UserSettingsEntity extends DataClass
       dailyGoal: Value(dailyGoal),
       reminderEnabled: Value(reminderEnabled),
       reminderInterval: Value(reminderInterval),
+      bedTimeHour: Value(bedTimeHour),
+      wakeUpHour: Value(wakeUpHour),
     );
   }
 
@@ -651,6 +711,8 @@ class UserSettingsEntity extends DataClass
       dailyGoal: serializer.fromJson<double>(json['dailyGoal']),
       reminderEnabled: serializer.fromJson<bool>(json['reminderEnabled']),
       reminderInterval: serializer.fromJson<int>(json['reminderInterval']),
+      bedTimeHour: serializer.fromJson<int>(json['bedTimeHour']),
+      wakeUpHour: serializer.fromJson<int>(json['wakeUpHour']),
     );
   }
   @override
@@ -663,6 +725,8 @@ class UserSettingsEntity extends DataClass
       'dailyGoal': serializer.toJson<double>(dailyGoal),
       'reminderEnabled': serializer.toJson<bool>(reminderEnabled),
       'reminderInterval': serializer.toJson<int>(reminderInterval),
+      'bedTimeHour': serializer.toJson<int>(bedTimeHour),
+      'wakeUpHour': serializer.toJson<int>(wakeUpHour),
     };
   }
 
@@ -673,6 +737,8 @@ class UserSettingsEntity extends DataClass
     double? dailyGoal,
     bool? reminderEnabled,
     int? reminderInterval,
+    int? bedTimeHour,
+    int? wakeUpHour,
   }) => UserSettingsEntity(
     uuid: uuid ?? this.uuid,
     createdAt: createdAt ?? this.createdAt,
@@ -680,6 +746,8 @@ class UserSettingsEntity extends DataClass
     dailyGoal: dailyGoal ?? this.dailyGoal,
     reminderEnabled: reminderEnabled ?? this.reminderEnabled,
     reminderInterval: reminderInterval ?? this.reminderInterval,
+    bedTimeHour: bedTimeHour ?? this.bedTimeHour,
+    wakeUpHour: wakeUpHour ?? this.wakeUpHour,
   );
   UserSettingsEntity copyWithCompanion(UserSettingsTableCompanion data) {
     return UserSettingsEntity(
@@ -693,6 +761,12 @@ class UserSettingsEntity extends DataClass
       reminderInterval: data.reminderInterval.present
           ? data.reminderInterval.value
           : this.reminderInterval,
+      bedTimeHour: data.bedTimeHour.present
+          ? data.bedTimeHour.value
+          : this.bedTimeHour,
+      wakeUpHour: data.wakeUpHour.present
+          ? data.wakeUpHour.value
+          : this.wakeUpHour,
     );
   }
 
@@ -704,7 +778,9 @@ class UserSettingsEntity extends DataClass
           ..write('deletedAt: $deletedAt, ')
           ..write('dailyGoal: $dailyGoal, ')
           ..write('reminderEnabled: $reminderEnabled, ')
-          ..write('reminderInterval: $reminderInterval')
+          ..write('reminderInterval: $reminderInterval, ')
+          ..write('bedTimeHour: $bedTimeHour, ')
+          ..write('wakeUpHour: $wakeUpHour')
           ..write(')'))
         .toString();
   }
@@ -717,6 +793,8 @@ class UserSettingsEntity extends DataClass
     dailyGoal,
     reminderEnabled,
     reminderInterval,
+    bedTimeHour,
+    wakeUpHour,
   );
   @override
   bool operator ==(Object other) =>
@@ -727,7 +805,9 @@ class UserSettingsEntity extends DataClass
           other.deletedAt == this.deletedAt &&
           other.dailyGoal == this.dailyGoal &&
           other.reminderEnabled == this.reminderEnabled &&
-          other.reminderInterval == this.reminderInterval);
+          other.reminderInterval == this.reminderInterval &&
+          other.bedTimeHour == this.bedTimeHour &&
+          other.wakeUpHour == this.wakeUpHour);
 }
 
 class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
@@ -737,6 +817,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
   final Value<double> dailyGoal;
   final Value<bool> reminderEnabled;
   final Value<int> reminderInterval;
+  final Value<int> bedTimeHour;
+  final Value<int> wakeUpHour;
   final Value<int> rowid;
   const UserSettingsTableCompanion({
     this.uuid = const Value.absent(),
@@ -745,6 +827,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
     this.dailyGoal = const Value.absent(),
     this.reminderEnabled = const Value.absent(),
     this.reminderInterval = const Value.absent(),
+    this.bedTimeHour = const Value.absent(),
+    this.wakeUpHour = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   UserSettingsTableCompanion.insert({
@@ -754,6 +838,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
     this.dailyGoal = const Value.absent(),
     this.reminderEnabled = const Value.absent(),
     this.reminderInterval = const Value.absent(),
+    this.bedTimeHour = const Value.absent(),
+    this.wakeUpHour = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : uuid = Value(uuid);
   static Insertable<UserSettingsEntity> custom({
@@ -763,6 +849,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
     Expression<double>? dailyGoal,
     Expression<bool>? reminderEnabled,
     Expression<int>? reminderInterval,
+    Expression<int>? bedTimeHour,
+    Expression<int>? wakeUpHour,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -772,6 +860,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
       if (dailyGoal != null) 'daily_goal': dailyGoal,
       if (reminderEnabled != null) 'reminder_enabled': reminderEnabled,
       if (reminderInterval != null) 'reminder_interval': reminderInterval,
+      if (bedTimeHour != null) 'bed_time_hour': bedTimeHour,
+      if (wakeUpHour != null) 'wake_up_hour': wakeUpHour,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -783,6 +873,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
     Value<double>? dailyGoal,
     Value<bool>? reminderEnabled,
     Value<int>? reminderInterval,
+    Value<int>? bedTimeHour,
+    Value<int>? wakeUpHour,
     Value<int>? rowid,
   }) {
     return UserSettingsTableCompanion(
@@ -792,6 +884,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
       dailyGoal: dailyGoal ?? this.dailyGoal,
       reminderEnabled: reminderEnabled ?? this.reminderEnabled,
       reminderInterval: reminderInterval ?? this.reminderInterval,
+      bedTimeHour: bedTimeHour ?? this.bedTimeHour,
+      wakeUpHour: wakeUpHour ?? this.wakeUpHour,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -817,6 +911,12 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
     if (reminderInterval.present) {
       map['reminder_interval'] = Variable<int>(reminderInterval.value);
     }
+    if (bedTimeHour.present) {
+      map['bed_time_hour'] = Variable<int>(bedTimeHour.value);
+    }
+    if (wakeUpHour.present) {
+      map['wake_up_hour'] = Variable<int>(wakeUpHour.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -832,6 +932,8 @@ class UserSettingsTableCompanion extends UpdateCompanion<UserSettingsEntity> {
           ..write('dailyGoal: $dailyGoal, ')
           ..write('reminderEnabled: $reminderEnabled, ')
           ..write('reminderInterval: $reminderInterval, ')
+          ..write('bedTimeHour: $bedTimeHour, ')
+          ..write('wakeUpHour: $wakeUpHour, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1087,6 +1189,8 @@ typedef $$UserSettingsTableTableCreateCompanionBuilder =
       Value<double> dailyGoal,
       Value<bool> reminderEnabled,
       Value<int> reminderInterval,
+      Value<int> bedTimeHour,
+      Value<int> wakeUpHour,
       Value<int> rowid,
     });
 typedef $$UserSettingsTableTableUpdateCompanionBuilder =
@@ -1097,6 +1201,8 @@ typedef $$UserSettingsTableTableUpdateCompanionBuilder =
       Value<double> dailyGoal,
       Value<bool> reminderEnabled,
       Value<int> reminderInterval,
+      Value<int> bedTimeHour,
+      Value<int> wakeUpHour,
       Value<int> rowid,
     });
 
@@ -1136,6 +1242,16 @@ class $$UserSettingsTableTableFilterComposer
 
   ColumnFilters<int> get reminderInterval => $composableBuilder(
     column: $table.reminderInterval,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bedTimeHour => $composableBuilder(
+    column: $table.bedTimeHour,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get wakeUpHour => $composableBuilder(
+    column: $table.wakeUpHour,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1178,6 +1294,16 @@ class $$UserSettingsTableTableOrderingComposer
     column: $table.reminderInterval,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get bedTimeHour => $composableBuilder(
+    column: $table.bedTimeHour,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get wakeUpHour => $composableBuilder(
+    column: $table.wakeUpHour,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$UserSettingsTableTableAnnotationComposer
@@ -1208,6 +1334,16 @@ class $$UserSettingsTableTableAnnotationComposer
 
   GeneratedColumn<int> get reminderInterval => $composableBuilder(
     column: $table.reminderInterval,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get bedTimeHour => $composableBuilder(
+    column: $table.bedTimeHour,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get wakeUpHour => $composableBuilder(
+    column: $table.wakeUpHour,
     builder: (column) => column,
   );
 }
@@ -1258,6 +1394,8 @@ class $$UserSettingsTableTableTableManager
                 Value<double> dailyGoal = const Value.absent(),
                 Value<bool> reminderEnabled = const Value.absent(),
                 Value<int> reminderInterval = const Value.absent(),
+                Value<int> bedTimeHour = const Value.absent(),
+                Value<int> wakeUpHour = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserSettingsTableCompanion(
                 uuid: uuid,
@@ -1266,6 +1404,8 @@ class $$UserSettingsTableTableTableManager
                 dailyGoal: dailyGoal,
                 reminderEnabled: reminderEnabled,
                 reminderInterval: reminderInterval,
+                bedTimeHour: bedTimeHour,
+                wakeUpHour: wakeUpHour,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -1276,6 +1416,8 @@ class $$UserSettingsTableTableTableManager
                 Value<double> dailyGoal = const Value.absent(),
                 Value<bool> reminderEnabled = const Value.absent(),
                 Value<int> reminderInterval = const Value.absent(),
+                Value<int> bedTimeHour = const Value.absent(),
+                Value<int> wakeUpHour = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => UserSettingsTableCompanion.insert(
                 uuid: uuid,
@@ -1284,6 +1426,8 @@ class $$UserSettingsTableTableTableManager
                 dailyGoal: dailyGoal,
                 reminderEnabled: reminderEnabled,
                 reminderInterval: reminderInterval,
+                bedTimeHour: bedTimeHour,
+                wakeUpHour: wakeUpHour,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

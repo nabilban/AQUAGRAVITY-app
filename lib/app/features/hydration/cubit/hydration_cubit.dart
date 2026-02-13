@@ -60,6 +60,8 @@ class HydrationCubit extends Cubit<HydrationState> {
             dailyGoal: data.settings.dailyGoal,
             reminderEnabled: data.settings.reminderEnabled,
             reminderInterval: data.settings.reminderInterval,
+            bedTimeHour: data.settings.bedTimeHour,
+            wakeUpHour: data.settings.wakeUpHour,
           ),
         );
       },
@@ -90,7 +92,11 @@ class HydrationCubit extends Cubit<HydrationState> {
     // Drift usually returns chronological unless specified.
     // Let's assume we want to schedule 'interval' minutes from NOW
     // because any update to logs or settings implies user interaction.
-    _notificationService.scheduleReminder(settings.reminderInterval);
+    _notificationService.scheduleReminder(
+      settings.reminderInterval,
+      settings.bedTimeHour,
+      settings.wakeUpHour,
+    );
   }
 
   /// Add a new hydration log
@@ -170,6 +176,40 @@ class HydrationCubit extends Cubit<HydrationState> {
       (failure) => emit(HydrationState.error(message: failure.message)),
       (settings) async {
         final updated = settings.copyWith(reminderInterval: minutes);
+        final result = await _settingsRepository.updateSettings(updated);
+        result.fold(
+          (failure) => emit(HydrationState.error(message: failure.message)),
+          (_) {},
+        );
+      },
+    );
+  }
+
+  /// Update bed time hour
+  Future<void> updateBedTime(int hour) async {
+    final currentSettingsResult = await _settingsRepository.getSettings();
+
+    currentSettingsResult.fold(
+      (failure) => emit(HydrationState.error(message: failure.message)),
+      (settings) async {
+        final updated = settings.copyWith(bedTimeHour: hour);
+        final result = await _settingsRepository.updateSettings(updated);
+        result.fold(
+          (failure) => emit(HydrationState.error(message: failure.message)),
+          (_) {},
+        );
+      },
+    );
+  }
+
+  /// Update wake up hour
+  Future<void> updateWakeUpTime(int hour) async {
+    final currentSettingsResult = await _settingsRepository.getSettings();
+
+    currentSettingsResult.fold(
+      (failure) => emit(HydrationState.error(message: failure.message)),
+      (settings) async {
+        final updated = settings.copyWith(wakeUpHour: hour);
         final result = await _settingsRepository.updateSettings(updated);
         result.fold(
           (failure) => emit(HydrationState.error(message: failure.message)),

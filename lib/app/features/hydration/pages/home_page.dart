@@ -118,14 +118,33 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
     return Scaffold(
       body: BlocBuilder<HydrationCubit, HydrationState>(
         builder: (context, state) {
           return state.when(
             initial: () => const Center(child: Text('Initializing...')),
             loading: () => const Center(child: CircularProgressIndicator()),
-            loaded: (logs, _, todayTotal, dailyGoal, p4, p5) =>
-                _buildLoadedView(context, logs, todayTotal, dailyGoal),
+            loaded:
+                (
+                  logs,
+                  _,
+                  todayTotal,
+                  dailyGoal,
+                  p4,
+                  p5,
+                  bedTimeHour,
+                  wakeUpHour,
+                ) => _buildLoadedView(
+                  context,
+                  logs,
+                  todayTotal,
+                  dailyGoal,
+                  theme,
+                ),
             error: (message) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -154,6 +173,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     List logs,
     double todayTotal,
     double dailyGoal,
+    ThemeData theme,
   ) {
     final progress = (todayTotal / dailyGoal).clamp(0.0, 1.0);
 
@@ -167,7 +187,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return Column(
       children: [
         // Gradient Header with Navigation
-        _buildHeader(context),
+        // Gradient Header with Navigation
+        _buildHeader(context, theme),
 
         // Content based on selected tab with fade animation
         Expanded(
@@ -190,6 +211,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       todayTotal,
                       dailyGoal,
                       progress,
+                      theme,
                     ),
                   )
                 : _selectedTab == 1
@@ -218,6 +240,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     double todayTotal,
     double dailyGoal,
     double progress,
+    ThemeData theme,
   ) {
     return SingleChildScrollView(
       child: Padding(
@@ -260,14 +283,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     return const SettingsPageContent();
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, ThemeData theme) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.secondary,
-            Theme.of(context).colorScheme.primary,
-          ],
+          colors: [theme.colorScheme.secondary, theme.colorScheme.primary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -288,14 +308,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 children: [
                   Icon(
                     Icons.water_drop,
-                    color: Theme.of(context).colorScheme.onPrimary,
+                    color: theme.colorScheme.onPrimary,
                     size: 32,
                   ),
                   const Gap(AppDimens.x2),
                   Text(
                     'AQUAGRAVITY',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onPrimary,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: theme.colorScheme.onPrimary,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1.2,
                     ),
@@ -307,7 +327,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       return IconButton(
                         icon: Icon(
                           isDark ? Icons.light_mode : Icons.dark_mode,
-                          color: Theme.of(context).colorScheme.onPrimary,
+                          color: theme.colorScheme.onPrimary,
                         ),
                         onPressed: () {
                           context.read<ThemeCubit>().updateTheme(
@@ -341,7 +361,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                           width: tabWidth,
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.onPrimary,
+                              color: theme.colorScheme.onPrimary,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
@@ -360,6 +380,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Expanded(
                               child: _buildNavTab(
                                 context,
+                                theme,
                                 icon: Icons.water_drop,
                                 label: 'Tracker',
                                 isSelected: _selectedTab == 0,
@@ -370,6 +391,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Expanded(
                               child: _buildNavTab(
                                 context,
+                                theme,
                                 icon: Icons.history,
                                 label: 'History',
                                 isSelected: _selectedTab == 1,
@@ -380,6 +402,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             Expanded(
                               child: _buildNavTab(
                                 context,
+                                theme,
                                 icon: Icons.settings,
                                 label: 'Settings',
                                 isSelected: _selectedTab == 2,
@@ -401,7 +424,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildNavTab(
-    BuildContext context, {
+    BuildContext context,
+    ThemeData theme, {
     required IconData icon,
     required String label,
     required bool isSelected,
@@ -415,9 +439,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           horizontal: AppDimens.x2,
         ),
         decoration: BoxDecoration(
-          color: Theme.of(
-            context,
-          ).colorScheme.onPrimary.withValues(alpha: 0.25),
+          color: theme.colorScheme.onPrimary.withValues(alpha: 0.25),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -426,8 +448,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             Icon(
               icon,
               color: isSelected
-                  ? Theme.of(context).colorScheme.secondary
-                  : Theme.of(context).colorScheme.onPrimary,
+                  ? theme.colorScheme.secondary
+                  : theme.colorScheme.onPrimary,
               size: 24,
             ),
             const Gap(4),
@@ -435,8 +457,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               label,
               style: TextStyle(
                 color: isSelected
-                    ? Theme.of(context).colorScheme.secondary
-                    : Theme.of(context).colorScheme.onPrimary,
+                    ? theme.colorScheme.secondary
+                    : theme.colorScheme.onPrimary,
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
@@ -764,11 +786,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.outline,
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.outline.withValues(alpha: 0.5),
                       width: 2,
                     ),
                   ),
                   enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.outline,
+                      width: 2,
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
                       color: Theme.of(context).colorScheme.outline,
@@ -799,8 +830,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Row(
-                children: [Icon(Icons.add, size: 20), Gap(4), Text('Add')],
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.add,
+                    size: 20,
+                    color: Theme.of(context).colorScheme.surface,
+                  ),
+                  const Gap(4),
+                  Text(
+                    'Add',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.surface,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
@@ -853,7 +898,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Text(
                     'No water logged yet today',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: Theme.of(context).colorScheme.outline,
                       fontSize: 14,
                     ),
                   ),

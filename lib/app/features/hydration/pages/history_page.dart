@@ -12,13 +12,33 @@ class HistoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+    final theme = Theme.of(context);
     return BlocBuilder<HydrationCubit, HydrationState>(
       builder: (context, state) {
         return state.when(
           initial: () => const Center(child: Text('Initializing...')),
           loading: () => const Center(child: CircularProgressIndicator()),
-          loaded: (logs, allLogs, todayTotal, dailyGoal, p4, p5) =>
-              _buildLoadedView(context, logs, allLogs, todayTotal, dailyGoal),
+          loaded:
+              (
+                logs,
+                allLogs,
+                todayTotal,
+                dailyGoal,
+                p4,
+                p5,
+                bedTimeHour,
+                wakeUpHour,
+              ) => _buildLoadedView(
+                context,
+                logs,
+                allLogs,
+                todayTotal,
+                dailyGoal,
+                theme,
+              ),
           error: (message) => Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -26,7 +46,7 @@ class HistoryPage extends StatelessWidget {
                 Icon(
                   Icons.error_outline,
                   size: 48,
-                  color: Theme.of(context).colorScheme.error,
+                  color: theme.colorScheme.error,
                 ),
                 const Gap(AppDimens.x4),
                 Text('Error: $message'),
@@ -51,6 +71,7 @@ class HistoryPage extends StatelessWidget {
     List<HydrationLog> allLogs,
     double todayTotal,
     double dailyGoal,
+    ThemeData theme,
   ) {
     // Group logs by date
     final Map<int, List<HydrationLog>> groupedLogs = {};
@@ -88,6 +109,7 @@ class HistoryPage extends StatelessWidget {
               context,
               dailyAverage: dailyAverage,
               daysTracked: daysTracked,
+              theme,
             ),
             const Gap(AppDimens.x6),
 
@@ -97,27 +119,25 @@ class HistoryPage extends StatelessWidget {
                 Icon(
                   Icons.calendar_today,
                   size: 20,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface,
                 ),
                 const Gap(AppDimens.x2),
                 Text(
                   'History',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ],
             ),
-            const Gap(AppDimens.x4),
-
             // History List
             if (sortedKeys.isNotEmpty)
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: sortedKeys.length,
-                separatorBuilder: (context, index) => const Gap(AppDimens.x3),
+                separatorBuilder: (context, index) => const Gap(AppDimens.x2),
                 itemBuilder: (context, index) {
                   final dateMillis = sortedKeys[index];
                   final date = DateTime.fromMillisecondsSinceEpoch(dateMillis);
@@ -147,11 +167,12 @@ class HistoryPage extends StatelessWidget {
                         dailyGoal, // Using current goal for history as simplification
                     progress: dayProgress,
                     isGoalMet: isGoalMet,
+                    theme,
                   );
                 },
               )
             else
-              _buildEmptyState(context),
+              _buildEmptyState(context, theme),
           ],
         ),
       ),
@@ -177,7 +198,8 @@ class HistoryPage extends StatelessWidget {
   }
 
   Widget _buildWeeklyStatsCard(
-    BuildContext context, {
+    BuildContext context,
+    ThemeData theme, {
     required double dailyAverage,
     required int daysTracked,
   }) {
@@ -185,19 +207,14 @@ class HistoryPage extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimens.x6),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            Theme.of(context).colorScheme.secondary,
-            Theme.of(context).colorScheme.primary,
-          ],
+          colors: [theme.colorScheme.secondary, theme.colorScheme.primary],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(
-              context,
-            ).colorScheme.secondary.withValues(alpha: 0.3),
+            color: theme.colorScheme.secondary.withValues(alpha: 0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -210,14 +227,14 @@ class HistoryPage extends StatelessWidget {
             children: [
               Icon(
                 Icons.trending_up,
-                color: Theme.of(context).colorScheme.onPrimary,
+                color: theme.colorScheme.onPrimary,
                 size: 24,
               ),
               const Gap(AppDimens.x2),
               Text(
                 'Weekly Stats',
                 style: TextStyle(
-                  color: Theme.of(context).colorScheme.onPrimary,
+                  color: theme.colorScheme.onPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -234,7 +251,7 @@ class HistoryPage extends StatelessWidget {
                     Text(
                       '${dailyAverage.toInt()} ml',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                        color: theme.colorScheme.onPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
@@ -243,9 +260,9 @@ class HistoryPage extends StatelessWidget {
                     Text(
                       'Daily Average',
                       style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onPrimary.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 14,
                       ),
                     ),
@@ -260,7 +277,7 @@ class HistoryPage extends StatelessWidget {
                     Text(
                       '$daysTracked',
                       style: TextStyle(
-                        color: Theme.of(context).colorScheme.onPrimary,
+                        color: theme.colorScheme.onPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
@@ -269,9 +286,9 @@ class HistoryPage extends StatelessWidget {
                     Text(
                       'Days Tracked',
                       style: TextStyle(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary.withValues(alpha: 0.7),
+                        color: theme.colorScheme.onPrimary.withValues(
+                          alpha: 0.7,
+                        ),
                         fontSize: 14,
                       ),
                     ),
@@ -286,7 +303,8 @@ class HistoryPage extends StatelessWidget {
   }
 
   Widget _buildHistoryCard(
-    BuildContext context, {
+    BuildContext context,
+    ThemeData theme, {
     required String date,
     required double amount,
     required double goal,
@@ -296,12 +314,12 @@ class HistoryPage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppDimens.x4),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
+        color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isGoalMet
-              ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
+              ? theme.colorScheme.primary
+              : theme.colorScheme.surfaceContainerHighest,
           width: isGoalMet ? 2 : 1,
         ),
         boxShadow: [
@@ -323,7 +341,7 @@ class HistoryPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
+                  color: theme.colorScheme.onSurface,
                 ),
               ),
               Row(
@@ -334,15 +352,15 @@ class HistoryPage extends StatelessWidget {
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: isGoalMet
-                          ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.secondary,
+                          ? theme.colorScheme.primary
+                          : theme.colorScheme.secondary,
                     ),
                   ),
                   if (isGoalMet) ...[
                     const Gap(AppDimens.x2),
                     Icon(
                       Icons.check_circle,
-                      color: Theme.of(context).colorScheme.primary,
+                      color: theme.colorScheme.primary,
                       size: 24,
                     ),
                   ],
@@ -354,7 +372,7 @@ class HistoryPage extends StatelessWidget {
           Text(
             '${amount.toInt()} ml / ${goal.toInt()} ml',
             style: TextStyle(
-              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              color: theme.colorScheme.onSurfaceVariant,
               fontSize: 14,
             ),
           ),
@@ -366,13 +384,13 @@ class HistoryPage extends StatelessWidget {
                   Icon(
                     Icons.celebration,
                     size: 14,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   const Gap(AppDimens.x1),
                   Text(
                     'Goal met',
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      color: theme.colorScheme.onSurfaceVariant,
                       fontSize: 12,
                       fontStyle: FontStyle.italic,
                     ),
@@ -386,13 +404,11 @@ class HistoryPage extends StatelessWidget {
             child: LinearProgressIndicator(
               value: progress,
               minHeight: 12,
-              backgroundColor: Theme.of(
-                context,
-              ).colorScheme.surfaceContainerHighest,
+              backgroundColor: theme.colorScheme.surfaceContainerHighest,
               valueColor: AlwaysStoppedAnimation<Color>(
                 isGoalMet
-                    ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.secondary,
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.secondary,
               ),
             ),
           ),
@@ -401,7 +417,7 @@ class HistoryPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, ThemeData theme) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimens.x8),
@@ -410,13 +426,13 @@ class HistoryPage extends StatelessWidget {
             Icon(
               Icons.calendar_today_outlined,
               size: 80,
-              color: Theme.of(context).colorScheme.outlineVariant,
+              color: theme.colorScheme.outlineVariant,
             ),
             const Gap(AppDimens.x4),
             Text(
               'No history yet',
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
@@ -426,7 +442,7 @@ class HistoryPage extends StatelessWidget {
               'Start tracking your water intake to see your history',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                color: theme.colorScheme.onSurfaceVariant,
                 fontSize: 14,
               ),
             ),
