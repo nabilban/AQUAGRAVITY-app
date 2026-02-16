@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
@@ -9,10 +11,17 @@ import '../../../../core/services/notification_service.dart';
 import 'hydration_state.dart';
 
 /// Cubit for hydration tracking feature
-class HydrationCubit extends Cubit<HydrationState> {
+class HydrationCubit extends Cubit<HydrationState> with WidgetsBindingObserver {
   final HydrationRepository _hydrationRepository;
   final SettingsRepository _settingsRepository;
   final NotificationService _notificationService = NotificationService();
+
+  StreamSubscription? _subscription;
+
+  // Track last state to avoid rescheduling notifications unnecessarily
+  List<HydrationLog>? _lastLogs;
+  UserSettings? _lastSettings;
+  bool? _lastGoalReached;
 
   HydrationCubit({
     required HydrationRepository hydrationRepository,
@@ -20,55 +29,93 @@ class HydrationCubit extends Cubit<HydrationState> {
   }) : _hydrationRepository = hydrationRepository,
        _settingsRepository = settingsRepository,
        super(const HydrationState.initial()) {
+    WidgetsBinding.instance.addObserver(this);
     _init();
   }
 
+  @override
+  Future<void> close() {
+    WidgetsBinding.instance.removeObserver(this);
+    _subscription?.cancel();
+    return super.close();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _init(showLoading: false);
+    }
+  }
+
   /// Initialize by watching logs and settings
-  void _init() {
-    emit(const HydrationState.loading());
+  void _init({bool showLoading = true}) {
+    _subscription?.cancel();
+    if (showLoading) emit(const HydrationState.loading());
+
+    // Ticker that emits every minute to handle midnight rollover
+    final ticker = Stream.periodic(
+      const Duration(minutes: 1),
+      (i) => i,
+    ).startWith(0);
 
     // Combine streams of logs and settings
-    Rx.combineLatest2(
-      _hydrationRepository.watchLogs(),
-      _settingsRepository.watchSettings(),
-      (logs, settings) => (logs: logs, settings: settings),
-    ).listen(
-      (data) {
-        final now = DateTime.now();
-        final startOfDay = DateTime(now.year, now.month, now.day);
-        final endOfDay = startOfDay.add(const Duration(days: 1));
+    _subscription =
+        Rx.combineLatest3(
+          _hydrationRepository.watchLogs(),
+          _settingsRepository.watchSettings(),
+          ticker,
+          (List<HydrationLog> logs, UserSettings settings, dynamic _) =>
+              (logs: logs, settings: settings),
+        ).listen(
+          (data) {
+            final now = DateTime.now();
+            final startOfDay = DateTime(now.year, now.month, now.day);
+            final endOfDay = startOfDay.add(const Duration(days: 1));
 
-        final todayLogs = data.logs
-            .where(
-              (log) =>
-                  log.timestamp.isAfter(startOfDay) &&
-                      log.timestamp.isBefore(endOfDay) ||
-                  log.timestamp.isAtSameMomentAs(startOfDay),
-            )
-            .toList();
+            final todayLogs = data.logs
+                .where(
+                  (log) =>
+                      (log.timestamp.isAfter(startOfDay) &&
+                          log.timestamp.isBefore(endOfDay)) ||
+                      log.timestamp.isAtSameMomentAs(startOfDay),
+                )
+                .toList();
 
-        final total = todayLogs.fold(0.0, (sum, log) => sum + log.amount);
+            final total = todayLogs.fold(0.0, (sum, log) => sum + log.amount);
+            final goalReached = total >= data.settings.dailyGoal;
 
-        // Handle notifications
-        _manageNotifications(todayLogs, data.settings, total);
+            // Smart Notification Handling:
+            // Only reschedule if logs changed, settings changed, or goal status changed (e.g. rollover reset)
+            final bool shouldReschedule =
+                !identical(data.logs, _lastLogs) ||
+                !identical(data.settings, _lastSettings) ||
+                (_lastGoalReached != null && _lastGoalReached! && !goalReached);
 
-        emit(
-          HydrationState.loaded(
-            logs: todayLogs,
-            allLogs: data.logs,
-            todayTotal: total,
-            dailyGoal: data.settings.dailyGoal,
-            reminderEnabled: data.settings.reminderEnabled,
-            reminderInterval: data.settings.reminderInterval,
-            bedTimeHour: data.settings.bedTimeHour,
-            wakeUpHour: data.settings.wakeUpHour,
-          ),
+            if (shouldReschedule) {
+              _manageNotifications(todayLogs, data.settings, total);
+            }
+
+            _lastLogs = data.logs;
+            _lastSettings = data.settings;
+            _lastGoalReached = goalReached;
+
+            emit(
+              HydrationState.loaded(
+                logs: todayLogs,
+                allLogs: data.logs,
+                todayTotal: total,
+                dailyGoal: data.settings.dailyGoal,
+                reminderEnabled: data.settings.reminderEnabled,
+                reminderInterval: data.settings.reminderInterval,
+                bedTimeHour: data.settings.bedTimeHour,
+                wakeUpHour: data.settings.wakeUpHour,
+              ),
+            );
+          },
+          onError: (error) {
+            emit(HydrationState.error(message: error.toString()));
+          },
         );
-      },
-      onError: (error) {
-        emit(HydrationState.error(message: error.toString()));
-      },
-    );
   }
 
   void _manageNotifications(
@@ -237,6 +284,6 @@ class HydrationCubit extends Cubit<HydrationState> {
 
   /// Refresh data
   void refresh() {
-    _init();
+    _init(showLoading: true);
   }
 }

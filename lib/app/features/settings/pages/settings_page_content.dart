@@ -917,23 +917,43 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
   }
 
   void _showClearDataDialog(BuildContext context) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        backgroundColor: theme.colorScheme.surfaceContainerHigh,
+        title: Row(
           children: [
-            Icon(Icons.warning, color: Colors.red),
-            Gap(AppDimens.x2),
-            Text('Clear All Data?'),
+            Icon(Icons.warning_amber_rounded, color: theme.colorScheme.error),
+            const Gap(AppDimens.x2),
+            Expanded(
+              child: Text(
+                'Clear All Data?',
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
-        content: const Text(
+        content: Text(
           'This will permanently delete all your hydration logs. This action cannot be undone.',
+          style: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant,
+            fontSize: 16,
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(
+              'Cancel',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () {
@@ -941,14 +961,20 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: const Row(
+                  content: Row(
                     children: [
-                      Icon(Icons.delete, color: Colors.white),
-                      Gap(AppDimens.x2),
-                      Text('All data cleared'),
+                      Icon(
+                        Icons.delete_outline,
+                        color: theme.colorScheme.onError,
+                      ),
+                      const Gap(AppDimens.x2),
+                      Text(
+                        'All data cleared',
+                        style: TextStyle(color: theme.colorScheme.onError),
+                      ),
                     ],
                   ),
-                  backgroundColor: Theme.of(context).colorScheme.error,
+                  backgroundColor: theme.colorScheme.error,
                   behavior: SnackBarBehavior.floating,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -957,15 +983,20 @@ class _SettingsPageContentState extends State<SettingsPageContent> {
               );
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.error,
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppDimens.x4,
+                vertical: AppDimens.x2,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
-            child: const Text(
-              'Clear Data',
-              style: TextStyle(color: Colors.white),
-            ),
+            child: const Text('Clear Data'),
           ),
         ],
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
   }
